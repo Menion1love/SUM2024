@@ -3,12 +3,16 @@ let
   gl,
   timeLoc;    
  
+let
+  zoom,
+  zoomLoc;
+
 // OpenGL initialization function  
 export function initGL() {
   canvas = document.getElementById("myCan");
   gl = canvas.getContext("webgl2");
   gl.clearColor(0, 0, 0, 1);
-  
+  zoom = 4.0;
   // Shader creation
   let vs_txt =
   `#version 300 es
@@ -17,7 +21,8 @@ export function initGL() {
     
   out vec2 DrawPos;
   uniform float Time;
- 
+  uniform float zoom;
+
   void main( void )
   {
     gl_Position = vec4(InPosition, 1);
@@ -28,50 +33,52 @@ export function initGL() {
   `#version 300 es
   precision highp float;
   out vec4 OutColor;
-  
+
   in vec2 DrawPos;
   uniform float Time;
-
-  #define W 1800.0
-  #define H 1500.0
-  #define X0 -1.0
-  #define Y0 -1.0
-  #define X1 1.0
-  #define Y1 1.0
+  uniform float zoom;
+  
+  float norm( vec2 Z )
+  {
+    return sqrt(Z.x * Z.x + Z.y * Z.y);
+  } 
+  
+  vec2 Mull( vec2 A, vec2 B )
+  {
+    vec2 r;
+    r.x = A.x * B.x - A.y * A.y;
+    r.y = A.x * B.y + B.x * A.y;
+    
+    return r;
+  }
+  
+  vec2 Add( vec2 A, vec2 B )
+  {
+    vec2 r;
+    r.x = A.x + B.x;
+    r.y = A.y + B.y;
+    
+    return r;
+  }
 
   float Julia( vec2 Z, vec2 C )
   {
     float n = 0.0;
     vec2 zn = Z;
-    while ((n < 256.0) && (sqrt(zn.x * zn.x + zn.y * zn.y) < 2.0))
+    while ((n < 256.0) && (norm(zn) < 2.0))
     {
       n++;
-      zn = (zn * zn + C);
+      zn = Add(Mull(zn, zn), C);
     }
     return n;
   }
   
-  float Mandle( vec2 Z )
-  {
-    float n = 0.0;
-    vec2 zn = Z;
-    while ((n < 256.0) && (sqrt(zn.x * zn.x + zn.y * zn.y) < 2.0))
-    {
-      n++;
-      zn = (zn * zn + Z);
-    }
-    return n;
-  }
-
   void main( void )
   {
-    vec2 z;
-    float n;
-    vec2 C = vec2(0.35, 0.39); 
-    z.x = (DrawPos.x * (X1 - X0)) * 1.0 + X0;
-    z.y = (DrawPos.y * (Y1 - Y0)) * 1.0 + Y0;
-    n = Julia(z, C);
-    OutColor = vec4(n, n / 8.0, n * 8.0, 1.0);
+    vec2 z = vec2(DrawPos.x * zoom, DrawPos.y * zoom);
+    vec2 C = vec2(0.35 + 0.08 * sin(Time + 3.0), 0.39 + 0.08 * sin(Time * 1.1));
+    float n = Julia(z, C);
+    OutColor = vec4(n * 0.05, n / 8.0 * 0.01, n * 8.0 * 0.01, 1);
   }
   `;
   let
@@ -102,7 +109,8 @@ export function initGL() {
  
   // Uniform data
   timeLoc = gl.getUniformLocation(prg, "Time");
- 
+  zoomLoc = gl.getUniformLocation(prg, "zoom"); 
+  
   gl.useProgram(prg);
 }  // End of 'initGL' function               
  
@@ -133,7 +141,13 @@ export function render() {
  
     gl.uniform1f(timeLoc, t);
   }
+  gl.uniform1f(zoomLoc, zoom);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 } // End of 'render' function
+
+export function zoomn() {
+  zoom++;
+  console.log(zoom);
+}
  
 console.log("CGSG forever!!! mylib.js imported");
