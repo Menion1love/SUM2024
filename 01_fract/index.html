@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ru" class="notranslate" translate="no">
+  <head>
+    <meta name="google" content="notranslate">    
+    <meta charset="utf-8" />
+    <title>fractalchik)))</title>
+  </head>
+  <body>
+    <canvas id="myCan" width="1800px" height="1500px" style="border: 2px solid red"></canvas>
+    <script type="module">
+      import * as damn from "./mylib.js";
+ 
+      window.addEventListener("load", () => {
+        damn.initGL();
+        const draw = () => {
+          // drawing
+          damn.render();
+ 
+          // animation register
+          window.requestAnimationFrame(draw);
+        };
+        draw();
+      });
+    </script>
+  </body>
+</html>
