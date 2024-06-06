@@ -1,45 +1,23 @@
-let
-  canvas,
-  gl,
-  timeLoc;    
- 
-let
-  centerX,
-  centerY, 
-  centerXLoc,
-  centerYLoc,
-  zoom,
-  zoomLoc;
+let form = [0.2, 0.02, 0.3, 1];
 
-// OpenGL initialization function  
+let canvas, gl, timeLoc;
+
+let centerX, centerY, centerXLoc, centerYLoc, zoom, zoomLoc;
+const bufID = 5;
+let framebuffer;
+
+// OpenGL initialization function
 export function initGL(event) {
   canvas = document.getElementById("myCan");
-  
+
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
-    zoommouse(e.deltaY * 0.001);
+    zoommouse(e.deltaY * 0.0007);
   });
 
   canvas.addEventListener("mousemove", (e) => {
     setcenter(e.clientX, e.clientY);
   });
-  
-  window.addEventListener("keydown", function (e) {
-        switch (e.keyCode) {
-          case 87:
-            damn.up();
-            break;
-          case 83:
-            damn.down();
-            break;
-          case 68:
-            damn.right();
-            break;
-          case 65:
-            damn.left();
-            break;
-        }
-      });
 
   gl = canvas.getContext("webgl2");
   gl.clearColor(1, 1, 1, 1);
@@ -47,8 +25,7 @@ export function initGL(event) {
   centerX = 0.0;
   centerY = 0.0;
   // Shader creation
-  let vs_txt =
-  `#version 300 es
+  let vs_txt = `#version 300 es
   precision highp float;
   in vec3 InPosition;
     
@@ -62,8 +39,7 @@ export function initGL(event) {
     DrawPos = InPosition.xy;
   }
   `;
-  let fs_txt =
-  `#version 300 es
+  let fs_txt = `#version 300 es
   precision highp float;
   out vec4 OutColor;
 
@@ -72,6 +48,12 @@ export function initGL(event) {
   uniform float zoom;
   uniform float centerX;
   uniform float centerY;
+
+  uniform buf
+  {
+    vec4 Data; 
+  };
+
 
   float norm( vec2 Z )
   {
@@ -111,13 +93,12 @@ export function initGL(event) {
   void main( void )
   {
     vec2 z = vec2(DrawPos.x * zoom + centerX, DrawPos.y * zoom + centerY);
-    vec2 C = vec2(0.35 + 0.08 * sin(Time + 3.0), 0.39 + 0.08 * sin(Time * 1.1));
+    vec2 C = vec2(0.35 + (Data.w / 10.0) * sin(Time * Data.w), 0.38 + 0.1 * sin(Time * Data.w));
     float n = Julia(z, C);
-    OutColor = vec4(n * 0.05, n / 8.0 * 0.01, n * 8.0 * 0.01, 1);
+    OutColor = vec4(n * Data.x / 5.0, n * Data.y / 5.0, n * Data.z / 5.0, 1);
   }
   `;
-  let
-    vs = loadShader(gl.VERTEX_SHADER, vs_txt),
+  let vs = loadShader(gl.VERTEX_SHADER, vs_txt),
     fs = loadShader(gl.FRAGMENT_SHADER, fs_txt),
     prg = gl.createProgram();
   gl.attachShader(prg, vs);
@@ -125,12 +106,25 @@ export function initGL(event) {
   gl.linkProgram(prg);
   if (!gl.getProgramParameter(prg, gl.LINK_STATUS)) {
     let buf = gl.getProgramInfoLog(prg);
-    console.log('Shader program link fail: ' + buf);
-  }                                            
- 
+    console.log("Shader program link fail: " + buf);
+  }
+
   // Vertex buffer creation
   const size = 0.8;
-  const vertexes = [-size, size, 0, -size, -size, 0, size, size, 0, size, -size, 0];
+  const vertexes = [
+    -size,
+    size,
+    0,
+    -size,
+    -size,
+    0,
+    size,
+    size,
+    0,
+    size,
+    -size,
+    0,
+  ];
   const posLoc = gl.getAttribLocation(prg, "InPosition");
   let vertexArray = gl.createVertexArray();
   gl.bindVertexArray(vertexArray);
@@ -141,16 +135,20 @@ export function initGL(event) {
     gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
     gl.enableVertexAttribArray(posLoc);
   }
- 
+
   // Uniform data
   timeLoc = gl.getUniformLocation(prg, "Time");
-  zoomLoc = gl.getUniformLocation(prg, "zoom"); 
+  zoomLoc = gl.getUniformLocation(prg, "zoom");
   centerXLoc = gl.getUniformLocation(prg, "centerX");
   centerYLoc = gl.getUniformLocation(prg, "centerY");
 
+  framebuffer = gl.createBuffer();
+  gl.bindBuffer(gl.UNIFORM_BUFFER, framebuffer);
+  gl.bufferData(gl.UNIFORM_BUFFER, 4 * 4, gl.STATIC_DRAW);
   gl.useProgram(prg);
-}  // End of 'initGL' function               
- 
+  gl.uniformBlockBinding(prg, gl.getUniformBlockIndex(prg, "buf"), bufID);
+} // End of 'initGL' function
+
 // Load and compile shader function
 function loadShader(shaderType, shaderSource) {
   const shader = gl.createShader(shaderType);
@@ -158,23 +156,26 @@ function loadShader(shaderType, shaderSource) {
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
     let buf = gl.getShaderInfoLog(shader);
-    console.log('Shader compile fail: ' + buf);
-  }                                            
+    console.log("Shader compile fail: " + buf);
+  }
   return shader;
 } // End of 'loadShader' function
-  
-let x = 1;                    
- 
+
 // Main render frame function
 export function render() {
   gl.clear(gl.COLOR_BUFFER_BIT);
-                                               
+
+  gl.bindBuffer(gl.UNIFORM_BUFFER, framebuffer);
+  gl.bufferData(gl.UNIFORM_BUFFER, new Float32Array(form), gl.STATIC_DRAW);
+  gl.bindBufferBase(gl.UNIFORM_BUFFER, bufID, framebuffer);
+
   if (timeLoc != -1) {
     const date = new Date();
-    let t = date.getMinutes() * 60 +
-            date.getSeconds() +
-            date.getMilliseconds() / 1000;
- 
+    let t =
+      date.getMinutes() * 60 +
+      date.getSeconds() +
+      date.getMilliseconds() / 1000;
+
     gl.uniform1f(timeLoc, t);
   }
   gl.uniform1f(centerXLoc, centerX);
@@ -183,54 +184,59 @@ export function render() {
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 } // End of 'render' function
 
-// Zomming near function 
-export function zoomsub() {
-  if (zoom > 0.1)
-    zoom -= 0.05;
-  //console.log(zoom);
-} // End of 'zoomsub' function
+// // Zomming near function
+// export function zoomsub() {
+//   if (zoom > 0.1) zoom -= 0.05;
+//   //console.log(zoom);
+// } // End of 'zoomsub' function
 
-// Zomming far function
-export function zoomplus() {
-  if (zoom < 10.0)
-    zoom += 0.05;
-} // End of 'zoomsub' function
+// // Zomming far function
+// export function zoomplus() {
+//   if (zoom < 10.0) zoom += 0.05;
+// } // End of 'zoomsub' function
 
 // Zomming far function
 export function zoommouse(scale) {
   zoom += scale;
-  if (zoom <= 0.0)
-    zoom = 0.0;
+  if (zoom <= 0.0) zoom = 0.0;
 } // End of 'zoomsub' function
 
 // Set new center
-export function setcenter(x, y){
-  centerX = x / 1000.0 - 0.5;
-  centerY = -y / 1000.0 + 0.5;
+export function setcenter(x, y) {
+  centerX = x / 300.0 - 2;
+  centerY = -y / 300.0 + 2;
 } // End of 'setcenter' function
 
-// Move right function   
-export function right ()
-{
-  centerX += 0.02
-} // End of 'right' function
+// // Move right function
+// export function right() {
+//   centerX += 0.02;
+// } // End of 'right' function
 
-// Move left function   
-export function left ()
-{
-  centerX -= 0.02
-} // End of 'left' function
+// // Move left function
+// export function left() {
+//   centerX -= 0.02;
+// } // End of 'left' function
 
-// Move up function   
-export function up ()
-{
-  centerY += 0.02
-} // End of 'up' function
+// // Move up function
+// export function up() {
+//   centerY += 0.02;
+// } // End of 'up' function
 
-// Move down function   
-export function down ()
-{
-  centerY -= 0.02
-} // End of 'down' function
+// // Move down function
+// export function down() {
+//   centerY -= 0.02;
+// } // End of 'down' function
+
+// Set color function
+export function setColor(x, y, z) {
+  form[0] = x;
+  form[1] = y;
+  form[2] = z;
+} // End of 'setColor' function
+
+// Set speed function
+export function setSpeed(x) {
+  form[3] = x;
+} // End of 'setSpeed' function
 
 console.log("CGSG forever!!! mylib.js imported");

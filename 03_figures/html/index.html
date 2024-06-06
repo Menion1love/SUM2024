@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+
+<html lang="ru" class="notranslate" translate="no">
+  <head>
+    <meta name="google" content="notranslate" />
+    <meta charset="utf-8" />
+    <link rel="shortcut icon" href="../res/m.png" type="image/png" />
+    <title>figures&#1645)))</title>
+  </head>
+  <body>
+    <canvas
+      id="myCan"
+      width="1200px"
+      height="1000px"
+      style="border: 1px solid white"
+    ></canvas>
+    <script type="module">
+      import * as damn from "../render/mth.js";
+      let x = damn.vec3(1, 2, 1), y = damn.vec3(0, 2, 0);
+      console.log(x, x.add(1), x.sub(1), x.dot(y), x.mul(y), y.normalize(), x.neg(), y.len())
+    </script>
+  </body>
+</html>
