@@ -1,13 +1,21 @@
-<!DOCTYPE html>
+<!doctype html>
+
 <html lang="ru" class="notranslate" translate="no">
   <head>
-    <meta name="google" content="notranslate">    
+    <script src="./output/main.js"></script>
+    <meta name="google" content="notranslate" />
     <meta charset="utf-8" />
     <link rel="shortcut icon" href="m.png" type="image/png" />
     <title>fractalchik)))</title>
   </head>
   <body>
-    <canvas id="myCan" width="1800px" height="1600px" style="border: 1px solid plum"></canvas>
+    <canvas
+      id="myCan"
+      width="1200px"
+      height="1000px"
+      style="border: 1px solid white"
+    ></canvas>
+    <canvas id="glcanvas" width="200" height="200"></canvas>
     <script type="module">
       import * as damn from "./mylib.js";
       window.addEventListener("load", () => {
@@ -15,10 +23,9 @@
         const draw = () => {
           // drawing
           damn.render();
- 
+
           // animation register
           window.requestAnimationFrame(draw);
-          
         };
         draw();
       });

@@ -4,15 +4,48 @@ let
   timeLoc;    
  
 let
+  centerX,
+  centerY, 
+  centerXLoc,
+  centerYLoc,
   zoom,
   zoomLoc;
 
 // OpenGL initialization function  
-export function initGL() {
+export function initGL(event) {
   canvas = document.getElementById("myCan");
+  
+  canvas.addEventListener("wheel", (e) => {
+    e.preventDefault();
+    zoommouse(e.deltaY * 0.001);
+  });
+
+  canvas.addEventListener("mousemove", (e) => {
+    setcenter(e.clientX, e.clientY);
+  });
+  
+  window.addEventListener("keydown", function (e) {
+        switch (e.keyCode) {
+          case 87:
+            damn.up();
+            break;
+          case 83:
+            damn.down();
+            break;
+          case 68:
+            damn.right();
+            break;
+          case 65:
+            damn.left();
+            break;
+        }
+      });
+
   gl = canvas.getContext("webgl2");
-  gl.clearColor(0, 0, 0, 1);
+  gl.clearColor(1, 1, 1, 1);
   zoom = 4.0;
+  centerX = 0.0;
+  centerY = 0.0;
   // Shader creation
   let vs_txt =
   `#version 300 es
@@ -37,7 +70,9 @@ export function initGL() {
   in vec2 DrawPos;
   uniform float Time;
   uniform float zoom;
-  
+  uniform float centerX;
+  uniform float centerY;
+
   float norm( vec2 Z )
   {
     return sqrt(Z.x * Z.x + Z.y * Z.y);
@@ -75,7 +110,7 @@ export function initGL() {
   
   void main( void )
   {
-    vec2 z = vec2(DrawPos.x * zoom, DrawPos.y * zoom);
+    vec2 z = vec2(DrawPos.x * zoom + centerX, DrawPos.y * zoom + centerY);
     vec2 C = vec2(0.35 + 0.08 * sin(Time + 3.0), 0.39 + 0.08 * sin(Time * 1.1));
     float n = Julia(z, C);
     OutColor = vec4(n * 0.05, n / 8.0 * 0.01, n * 8.0 * 0.01, 1);
@@ -110,7 +145,9 @@ export function initGL() {
   // Uniform data
   timeLoc = gl.getUniformLocation(prg, "Time");
   zoomLoc = gl.getUniformLocation(prg, "zoom"); 
-  
+  centerXLoc = gl.getUniformLocation(prg, "centerX");
+  centerYLoc = gl.getUniformLocation(prg, "centerY");
+
   gl.useProgram(prg);
 }  // End of 'initGL' function               
  
@@ -130,7 +167,6 @@ let x = 1;
  
 // Main render frame function
 export function render() {
-  // console.log(`Frame ${x++}`);
   gl.clear(gl.COLOR_BUFFER_BIT);
                                                
   if (timeLoc != -1) {
@@ -141,13 +177,60 @@ export function render() {
  
     gl.uniform1f(timeLoc, t);
   }
+  gl.uniform1f(centerXLoc, centerX);
+  gl.uniform1f(centerYLoc, centerY);
   gl.uniform1f(zoomLoc, zoom);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 } // End of 'render' function
 
-export function zoomn() {
-  zoom++;
-  console.log(zoom);
-}
- 
+// Zomming near function 
+export function zoomsub() {
+  if (zoom > 0.1)
+    zoom -= 0.05;
+  //console.log(zoom);
+} // End of 'zoomsub' function
+
+// Zomming far function
+export function zoomplus() {
+  if (zoom < 10.0)
+    zoom += 0.05;
+} // End of 'zoomsub' function
+
+// Zomming far function
+export function zoommouse(scale) {
+  zoom += scale;
+  if (zoom <= 0.0)
+    zoom = 0.0;
+} // End of 'zoomsub' function
+
+// Set new center
+export function setcenter(x, y){
+  centerX = x / 1000.0 - 0.5;
+  centerY = -y / 1000.0 + 0.5;
+} // End of 'setcenter' function
+
+// Move right function   
+export function right ()
+{
+  centerX += 0.02
+} // End of 'right' function
+
+// Move left function   
+export function left ()
+{
+  centerX -= 0.02
+} // End of 'left' function
+
+// Move up function   
+export function up ()
+{
+  centerY += 0.02
+} // End of 'up' function
+
+// Move down function   
+export function down ()
+{
+  centerY -= 0.02
+} // End of 'down' function
+
 console.log("CGSG forever!!! mylib.js imported");
