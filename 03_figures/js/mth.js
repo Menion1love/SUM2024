@@ -321,7 +321,12 @@ class _mat4 {
       for (let i = 0; i < 4; i++) for (let j = 0; j < 4; j++) this.m[i][j] *= n;
       return this;
     } else if (typeof n == "object" && n.m.length == 4) {
-      let r = mat4();
+      let r = mat4([
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+        [0, 0, 0, 0],
+      ]);
       for (let i = 0; i < 4; i++)
         for (let j = 0; j < 4; j++)
           for (let k = 0; k < 4; k++) r.m[i][j] += this.m[i][k] * n.m[k][j];
