@@ -12,12 +12,22 @@
       id="myCan"
       width="1200px"
       height="1000px"
-      style="border: 1px solid white"
+      style="border: 1px solid purple"
     ></canvas>
     <script type="module">
-      import * as damn from "../render/mth.js";
-      let x = damn.vec3(1, 2, 1), y = damn.vec3(0, 2, 0);
-      console.log(x, x.add(1), x.sub(1), x.dot(y), x.mul(y), y.normalize(), x.neg(), y.len())
+      import * as render from "../render/render.js";
+      window.addEventListener("load", () => {
+        render.initGL();
+        const draw = () => {
+          // drawing
+          render.render();
+
+          // animation register
+          window.requestAnimationFrame(draw);
+        };
+        draw();
+      });
+    </script>
     </script>
   </body>
 </html>
