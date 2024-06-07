@@ -1,46 +1,87 @@
 import { vec3 } from "./mth.js";
 import { mat4 } from "./mth.js";
+import { Timer } from "./timer.js";
 
-let canvas, gl, timeLoc;
+// Buffers
+const pBuf = 1;
+let primBuf;
+
+// Some extern params
+let canvas, gl, timeLoc, myTimer, time;
+
+// Cube vertices
 let cube = [
+  // Font
   vec3(0, 0, 0),
   vec3(0.2, 0.0, 0.0),
   vec3(0.2, 0.2, 0.0),
   vec3(0.0, 0.2, 0.0),
+  // Down
+  vec3(0, 0, 0),
+  vec3(0, 0.0, 0.2),
+  vec3(0.2, 0.0, 0.2),
+  vec3(0.2, 0.0, 0.0),
+  // Font
+  vec3(0, 0, 0),
+  vec3(0.0, 0, 0.2),
+  vec3(0.0, 0.2, 0.2),
+  vec3(0.0, 0.2, 0.0),
+  // Font
+  vec3(0.2, 0.2, 0.2),
+  vec3(0.2, 0.0, 0.2),
+  vec3(0.2, 0, 0.0),
+  vec3(0.2, 0.2, 0.0),
+  // Font
+  vec3(0.2, 0.2, 0.2),
+  vec3(0, 0.2, 0.2),
+  vec3(0, 0, 0.2),
+  vec3(0.2, 0, 0.2),
+  // Font
+  vec3(0.2, 0.2, 0.2),
+  vec3(0, 0.2, 0.2),
+  vec3(0, 0.2, 0.0),
+  vec3(0.2, 0.2, 0.0),
 ];
 let cubeVerticesIndexBuffer;
-
-class Render {}
 
 export function initGL() {
   canvas = document.getElementById("myCan");
   gl = canvas.getContext("webgl2");
   gl.clearColor(0, 0, 0, 1);
+  myTimer = new Timer();
 
   // Shader creation
   let vs_txt = `#version 300 es
   precision highp float;
   in vec3 InPosition;
     
-  out vec2 DrawPos;
+  out vec3 DrawPos;
   uniform float Time;
-  
+
+  uniform bufW
+  {
+    mat4 W;
+    mat4 WVP;
+    mat4 WInv;
+  };
+
   void main( void )
   {
-    gl_Position = vec4(InPosition, 1);
-    DrawPos = InPosition.xy;
+    gl_Position = WVP * vec4(InPosition, 1);
+    DrawPos = vec3(W * vec4(InPosition, 1)) * 2.0;
   }
   `;
   let fs_txt = `#version 300 es
   precision highp float;
   out vec4 OutColor;
 
-  in vec2 DrawPos;
+  in vec3 DrawPos;
   uniform float Time;
   
+
   void main( void )
   {
-    OutColor = vec4(DrawPos.x, DrawPos.y, 1, 1);
+    OutColor = vec4(DrawPos.x, DrawPos.y, DrawPos.z, 1);
   }
   `;
   let vs = loadShader(gl.VERTEX_SHADER, vs_txt),
@@ -53,21 +94,17 @@ export function initGL() {
     let buf = gl.getProgramInfoLog(prg);
     console.log("Shader program link fail: " + buf);
   }
+
   // Vertex buffer creation
-  const vertexes = [
-    cube[0].x,
-    cube[0].y,
-    cube[0].z,
-    cube[1].x,
-    cube[1].y,
-    cube[1].z,
-    cube[2].x,
-    cube[2].y,
-    cube[2].z,
-    cube[3].x,
-    cube[3].y,
-    cube[3].z,
-  ];
+  const vertexes = [];
+  let j = 0;
+  for (let i = 0; i < 24; i++) {
+    (vertexes[j] = cube[i].x),
+      (vertexes[j + 1] = cube[i].y),
+      (vertexes[j + 2] = cube[i].z);
+    j += 3;
+  }
+
   const posLoc = gl.getAttribLocation(prg, "InPosition");
   let vertexArray = gl.createVertexArray();
   gl.bindVertexArray(vertexArray);
@@ -80,7 +117,10 @@ export function initGL() {
   }
   cubeVerticesIndexBuffer = gl.createBuffer();
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
-  let cubeVertexIndices = [0, 1, 2, 0, 2, 3];
+  let cubeVertexIndices = [
+    0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14,
+    15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23,
+  ];
 
   gl.bufferData(
     gl.ELEMENT_ARRAY_BUFFER,
@@ -90,7 +130,14 @@ export function initGL() {
 
   // Uniform data
   timeLoc = gl.getUniformLocation(prg, "Time");
+
+  // Primitive data buffer creation
+  primBuf = gl.createBuffer();
+  gl.bindBuffer(gl.UNIFORM_BUFFER, primBuf);
+  gl.bufferData(gl.UNIFORM_BUFFER, 16 * 9, gl.STATIC_DRAW);
+
   gl.useProgram(prg);
+  gl.uniformBlockBinding(prg, gl.getUniformBlockIndex(prg, "bufW"), pBuf);
 } // End of 'initGL' function
 
 // Load and compile shader function
@@ -107,18 +154,31 @@ function loadShader(shaderType, shaderSource) {
 
 // Main render frame function
 export function render() {
+  // Set new params to timer
+  myTimer.response();
+  time = myTimer.localTime;
+
+  // Set matrixes
+  let w = mat4().mul(mat4()),
+    winv = w.inverse().setTranspose(),
+    wvp = mat4()
+      .setRotateY(time * 45)
+      .inverse();
+
+  // Send info to shader
+  let primdata = [].concat(w.toArray(), wvp.toArray(), winv.toArray());
+  gl.bindBuffer(gl.UNIFORM_BUFFER, primBuf);
+  gl.bufferData(gl.UNIFORM_BUFFER, new Float32Array(primdata), gl.STATIC_DRAW);
+  gl.bindBufferBase(gl.UNIFORM_BUFFER, pBuf, primBuf);
+  gl.uniform1f(timeLoc, time);
+
+  // Clear depth and color
   gl.clear(gl.COLOR_BUFFER_BIT);
   gl.clear(gl.DEPTH_BUFFER_BIT);
   gl.enable(gl.DEPTH_TEST);
-  if (timeLoc != -1) {
-    const date = new Date();
-    let t =
-      date.getMinutes() * 60 +
-      date.getSeconds() +
-      date.getMilliseconds() / 1000;
+  gl.clearDepth(1.0);
 
-    gl.uniform1f(timeLoc, t);
-  }
+  // Drawing
   gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, cubeVerticesIndexBuffer);
-  gl.drawElements(gl.TRIANGLES, 6, gl.UNSIGNED_SHORT, 0);
+  gl.drawElements(gl.TRIANGLES, 36, gl.UNSIGNED_SHORT, 0);
 } // End of 'render' function
