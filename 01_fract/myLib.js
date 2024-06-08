@@ -10,10 +10,7 @@ let framebuffer;
 export function initGL(event) {
   canvas = document.getElementById("myCan");
 
-  canvas.addEventListener("wheel", (e) => {
-    e.preventDefault();
-    zoommouse(e.deltaY * 0.0007);
-  });
+  
 
   canvas.addEventListener("mousemove", (e) => {
     setcenter(e.clientX, e.clientY);

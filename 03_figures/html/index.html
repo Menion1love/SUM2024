@@ -10,117 +10,80 @@
   <body>
     <canvas
       id="CanCube"
-      width="800px"
-      height="800px"
+      width="600px"
+      height="600px"
       style="border: 1px solid purple"
     ></canvas>
     <canvas
       id="CanTriangle"
-      width="800px"
-      height="800px"
+      width="600px"
+      height="600px"
       style="border: 1px solid purple"
     ></canvas>
     <canvas
       id="CanCryst"
-      width="800px"
-      height="800px"
+      width="600px"
+      height="600px"
       style="border: 1px solid purple"
     ></canvas>
     <script type="module">
       import * as render from "../js/render.js";
       import * as v from "../js/mth.js";
       window.addEventListener("load", () => {
+        
         let cube = [
-          // Font
-          v.vec3(0, 0, 0),
-          v.vec3(0.2, 0.0, 0.0),
-          v.vec3(0.2, 0.2, 0.0),
-          v.vec3(0.0, 0.2, 0.0),
-          // Down
-          v.vec3(0, 0, 0),
-          v.vec3(0, 0.0, 0.2),
-          v.vec3(0.2, 0.0, 0.2),
-          v.vec3(0.2, 0.0, 0.0),
-          // Font
-          v.vec3(0, 0, 0),
-          v.vec3(0.0, 0, 0.2),
-          v.vec3(0.0, 0.2, 0.2),
-          v.vec3(0.0, 0.2, 0.0),
-          // Font
-          v.vec3(0.2, 0.2, 0.2),
-          v.vec3(0.2, 0.0, 0.2),
-          v.vec3(0.2, 0, 0.0),
-          v.vec3(0.2, 0.2, 0.0),
-          // Font
-          v.vec3(0.2, 0.2, 0.2),
-          v.vec3(0, 0.2, 0.2),
-          v.vec3(0, 0, 0.2),
-          v.vec3(0.2, 0, 0.2),
-          // Font
-          v.vec3(0.2, 0.2, 0.2),
-          v.vec3(0, 0.2, 0.2),
-          v.vec3(0, 0.2, 0.0),
-          v.vec3(0.2, 0.2, 0.0),
+          v.vec3(-1, 1, -1),
+          v.vec3(1, 1, -1),
+          v.vec3(1, -1, -1),
+          v.vec3(-1, -1, -1),
+          v.vec3(-1, 1, 1),
+          v.vec3(1, 1, 1),
+          v.vec3(1, -1, 1),
+          v.vec3(-1, -1, 1),
         ];
         let trg = [
           // Font
-          v.vec3(0, 0, 0),
-          v.vec3(0.2, 0.0, 0.0),
-          v.vec3(0.1, 0.2, 0.1),
-          // Down
-          v.vec3(0, 0, 0),
-          v.vec3(0.1, 0.0, 0.2),
-          v.vec3(0.2, 0.0, 0.0),
-          // Font
-          v.vec3(0, 0, 0),
-          v.vec3(0.1, 0.2, 0.1),
-          v.vec3(0.1, 0.0, 0.2),
-          // Font
-          v.vec3(0.1, 0.0, 0.2),
-          v.vec3(0.2, 0.0, 0.0),
-          v.vec3(0.1, 0.2, 0.1),
+          v.vec3(-1, -1, -1),
+          v.vec3(1, -1, -1),
+          v.vec3(0, 1, 0),
+          v.vec3(0, -1, 1),
         ];
         let cryst = [
-          // Font
-          // v.vec3(0, 0, 0),
-          // v.vec3(0.1, 0.2, 0.1),
-          // v.vec3(0.2, 0, 0),
-          // v.vec3(0, 0, 0),
-          // v.vec3(0.1, -0.2, 0.1),
-          // v.vec3(0.2, 0, 0),
-          // Down
-          // v.vec3(0, 0, 0),
-          // v.vec3(0.1, 0.2, 0.1),
-          // v.vec3(0, 0, 0.2),
-          // v.vec3(0, 0, 0),
-          // v.vec3(0.1, -0.2, 0.1),
-          // v.vec3(0, 0, 0.2),
-          // Font
-          v.vec3(0.2, 0, 0.2),
-          v.vec3(0.1, 0.2, 0.1),
-          v.vec3(0, 0, 0.2),
-          v.vec3(0.2, 0, 0.2),
-          v.vec3(0.1, -0.2, 0.1),
-          v.vec3(0, 0, 0.2),
-          // Font
-          v.vec3(0.2, 0, 0.2),
-          v.vec3(0.1, 0.2, 0.1),
-          v.vec3(0.2, 0, 0),
-          v.vec3(0.2, 0, 0.2),
-          v.vec3(0.1, -0.2, 0.1),
-          v.vec3(0.2, 0, 0),
+          v.vec3(0, 0, 1),
+          v.vec3(0, -1, 0),
+          v.vec3(-1, 0, 0),
+          v.vec3(0, 1, 0),
+          v.vec3(1, 0, 0),
+          v.vec3(0, 0, -1),
         ];
         let IndicesC = [
-          0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14,
-          15, 16, 17, 18, 16, 18, 19, 20, 21, 22, 20, 22, 23,
+            2, 1, 5,
+            2, 5, 6,
+            0, 1, 2,
+            0, 2, 3,
+            3, 2, 6,
+            3, 6, 7,
+            0, 3, 7,
+            0, 7, 4,
+            1, 0, 4,
+            1, 4, 5,
+            6, 5, 4,
+            6, 4, 7,
         ];
         let IndicesT = [
-          0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7,
+          0, 1, 2, 0, 2, 3, 0, 3, 2, 1, 2, 3 
         ];
         let IndicesCr = [
-          0, 1, 2, 0, 2, 3, 4, 5, 6, 4, 6, 7, 8, 9, 10, 8, 10, 11, 12, 13, 14, 12, 14,
-          15
+          0, 1, 2, //
+          0, 2, 3, //
+          0, 3, 4, 
+          1, 2, 4, 
+          1, 2, 5, 
+          0, 3, 5, 
+          0, 5, 4, 
+          1, 5, 4 
         ];
+        render.CreateOct(cube)
         const primc = render.primCreate(cube, IndicesC)
         const primt = render.primCreate(trg, IndicesT)
         const primcr = render.primCreate(cryst, IndicesCr)

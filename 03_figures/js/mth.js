@@ -115,7 +115,7 @@ class _mat4 {
     else this.m = m.m;
 
     // Translate matrix
-    this.addMethod(this, "setTranslate", (dx, dy, dz) => {
+    this.addMethod(this, "translate", (dx, dy, dz) => {
       this.m = [
         [1, 0, 0, 0],
         [0, 1, 0, 0],
@@ -124,12 +124,12 @@ class _mat4 {
       ];
       return this;
     });
-    this.addMethod(this, "setTranslate", (v) => {
-      return this.setTranslate(v.x, v.y, x.z);
+    this.addMethod(this, "translate", (v) => {
+      return this.translate(v.x, v.y, x.z);
     });
 
     // Transpose matrix
-    this.addMethod(this, "setTranspose", () => {
+    this.addMethod(this, "transpose", () => {
       let r = mat4();
       for (let i = 0; i < 4; i++)
         for (let j = 0; j < 4; j++) r.m[i][j] = this.m[j][i];
@@ -137,7 +137,7 @@ class _mat4 {
     });
 
     // Scale matrix
-    this.addMethod(this, "setScale", (dx, dy, dz) => {
+    this.addMethod(this, "scale", (dx, dy, dz) => {
       this.m = [
         [dx, 0, 0, 0],
         [0, dy, 0, 0],
@@ -146,11 +146,12 @@ class _mat4 {
       ];
       return this;
     });
-    this.addMethod(this, "setScale", (v) => {
-      return this.setScale(v.x, v.y, v.z);
+    this.addMethod(this, "scale", (v) => {
+      if (typeof v == "number") return this.scale(v, v, v);
+      else return this.scale(v.x, v.y, v.z);
     });
     // Rotate matrix on x
-    this.addMethod(this, "setRotateX", (ang) => {
+    this.addMethod(this, "rotateX", (ang) => {
       let co = Math.cos(D2R(ang)),
         si = Math.sin(D2R(ang));
       this.m = [
@@ -162,7 +163,7 @@ class _mat4 {
       return this;
     });
     // Rotate matrix on y
-    this.addMethod(this, "setRotateY", (ang) => {
+    this.addMethod(this, "rotateY", (ang) => {
       let co = Math.cos(D2R(ang)),
         si = Math.sin(D2R(ang));
       this.m = [
@@ -174,7 +175,7 @@ class _mat4 {
       return this;
     });
     // Rotate matrix on z
-    this.addMethod(this, "setRotateZ", (ang) => {
+    this.addMethod(this, "rotateZ", (ang) => {
       let co = Math.cos(D2R(ang)),
         si = Math.sin(D2R(ang));
       this.m = [
@@ -185,7 +186,7 @@ class _mat4 {
       ];
       return this;
     });
-    this.addMethod(this, "setOrtho", (l, r, b, t, n, f) => {
+    this.addMethod(this, "ortho", (l, r, b, t, n, f) => {
       this.m = [
         [2 / (r - l), 0, 0, 0],
         [0, 2 / (t - b), 0, 0],
@@ -291,7 +292,7 @@ class _mat4 {
             det;
       return r;
     });
-    this.addMethod(this, "setView", (loc, at, up1) => {
+    this.addMethod(this, "view", (loc, at, up1) => {
       if (loc == undefined) return mat4();
       else {
         let d = vec3.normalize.sub(at, loc),
@@ -306,7 +307,7 @@ class _mat4 {
         return this;
       }
     });
-    this.addMethod(this, "setFrustum", (l, r, b, t, n, f) => {
+    this.addMethod(this, "frustum", (l, r, b, t, n, f) => {
       this.m = [
         [(2 * n) / (r - l), 0, 0, 0],
         [0, (2 * n) / (t - b), 0, 0],
