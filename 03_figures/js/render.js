@@ -6,13 +6,14 @@ export function rnd(...args) {
   return new Render(...args);
 }
 
-function setArr(arr, l) {
+function setArr(arr1, arr2, l) {
   let j = 0,
     m = [];
-
   for (let i = 0; i < l; i++) {
-    (m[j] = arr[i].x), (m[j + 1] = arr[i].y), (m[j + 2] = arr[i].z);
-    j += 3;
+    (m[j] = arr1[i].x), (m[j + 1] = arr1[i].y), (m[j + 2] = arr1[i].z);
+
+    (m[j + 3] = arr2[i].x), (m[j + 4] = arr2[i].y), (m[j + 5] = arr2[i].z);
+    j += 6;
   }
 
   return m;
@@ -30,11 +31,22 @@ class Render {
     this.Inds = prim.ind;
     gl.clearColor(0.5, 0.1, 0.9, 1);
     this.scale = 0.3;
-
+    this.rotateY = 0;
+    this.rotateX = 0;
+    //MatrWorld = mat4();
     this.canvas.addEventListener("wheel", (e) => {
       e.preventDefault();
       this.scale += e.deltaY * 0.0001;
       if (this.scale < 0.0) this.scale = 0.0;
+    });
+
+    this.canvas.addEventListener("mousemove", (e) => {
+      if (e.which == 1) {
+        e.preventDefault();
+        this.rotateY += -e.movementY * 0.9;
+        this.rotateX += -e.movementX * 0.9;
+      }
+      //if (this.scale < 0.0) this.scale = 0.0;
     });
 
     // Load shaders
@@ -68,8 +80,8 @@ class Render {
 
     void main( void )
     {
-      gl_Position = WVP * vec4(InPosition, 1);
-      DrawPos = vec3(W * vec4(InPosition, 1));
+      gl_Position = WVP * vec4(InPosition, 1.0);
+      DrawPos = vec3(W * vec4(InPosition, 1.0));
       DrawNormal =  mat3(transpose(inverse(W))) * InNormal;
     }
     `;
@@ -85,18 +97,18 @@ class Render {
     {
       vec3 V = normalize(DrawPos);
       vec3 N = normalize(DrawNormal);
-      vec3 L = normalize(vec3(1, 0, -1));
+      vec3 L = normalize(vec3(1.0, 0.0, 0.0));
       vec3 color = vec3(0.8, 0.2, 0.5);
       N = faceforward(N, V, N);
-      float d = length(vec3(1, 1, 1));
+      float d = length(vec3(1.0, 1.0, 1.0));
       float cc = 1.0, cl = 0.01, cq = 0.001; 
       float att = min(1.0, 1.0 / (cc + cl * d + cq * d * d));        
       
       color += 0.15 * max(0.0, dot(V, L));
-      color += 0.01 * max(0.0, pow(dot((reflect(V, N)), L), 1.0));
+      color += 0.08 * max(0.0, pow(dot((reflect(V, vec3(N.x, -N.y, N.z))), L), 1.0));
       color *= att;
       
-      OutColor = vec4(N, 1);
+      OutColor = vec4(N, 1.0);
     }
     `;
     let vs = loadShader(gl.VERTEX_SHADER, vs_txt),
@@ -111,22 +123,20 @@ class Render {
     }
 
     // Vertex buffer creation
-    const vertexes = setArr(prim.vert, prim.vert.length);
-
-    // Normals buffer creation
-    const normalsdata = setArr(prim.norm, prim.norm.length);
+    const vertexes = setArr(prim.vert, prim.norm, prim.vert.length);
 
     const posLoc = gl.getAttribLocation(prg, "InPosition");
+    const normLoc = gl.getAttribLocation(prg, "InNormal");
+
     let vertexArray = gl.createVertexArray();
     gl.bindVertexArray(vertexArray);
     let vertexBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
     gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexes), gl.STATIC_DRAW);
-    const normLoc = gl.getAttribLocation(prg, "InNormal");
-    gl.vertexAttribPointer(normLoc, 3, gl.FLOAT, false, 0, vertexes.length);
-    if (posLoc != -1) {
-      gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+    if (posLoc != -1 && normLoc != -1) {
+      gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 24, 0);
       gl.enableVertexAttribArray(posLoc);
+      gl.vertexAttribPointer(normLoc, 3, gl.FLOAT, false, 24, 12);
       gl.enableVertexAttribArray(normLoc);
     }
     this.cubeVerticesIndexBuffer = gl.createBuffer();
@@ -142,7 +152,7 @@ class Render {
     // Primitive data buffer creation
     this.primBuf = gl.createBuffer();
     gl.bindBuffer(gl.UNIFORM_BUFFER, this.primBuf);
-    gl.bufferData(gl.UNIFORM_BUFFER, 16 * 9, gl.STATIC_DRAW);
+    gl.bufferData(gl.UNIFORM_BUFFER, 16 * 16, gl.STATIC_DRAW);
 
     gl.useProgram(prg);
     gl.uniformBlockBinding(
@@ -183,12 +193,19 @@ class Render {
     const draw = () => {
       MatrWorld = mat4().mul(
         mat4()
-          .rotateX(0)
-          .mul(mat4().scale(this.scale))
+          .scale(this.scale)
           .mul(
             mat4()
-              .translate(0, Math.sin(this.time) / 5, 0)
-              .mul(mat4().rotateZ(0))
+              .rotateX(this.rotateY)
+              .mul(
+                mat4()
+                  .rotateY(this.rotateX)
+                  .mul(
+                    mat4()
+                      .translate(0, Math.sin(this.time) / 10, 0)
+                      .mul(mat4().rotateY(15 * this.time))
+                  )
+              )
           )
       );
       // drawing

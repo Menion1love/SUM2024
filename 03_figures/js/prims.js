@@ -7,6 +7,10 @@ export function primCreate(...args) {
 function Normals(vert, ind) {
   let N = [];
 
+  for (let i = 0; i < vert.length; i++) {
+    N[i] = vec3(0);
+  }
+
   for (let i = 0; i < ind.length; i += 3) {
     let n0 = ind[i],
       n1 = ind[i + 1],
@@ -14,13 +18,10 @@ function Normals(vert, ind) {
     let p0 = vert[n0],
       p1 = vert[n1],
       p2 = vert[n2];
-    let v1 = p1.sub(p0),
-      v2 = p2.sub(p0),
-      cr = v1.cross(v2),
-      n = cr.normalize();
-    N[n0] = vec3(0).add(n);
-    N[n1] = vec3(0).add(n);
-    N[n2] = vec3(0).add(n);
+    let n = p1.sub(p0).cross(p2.sub(p0)).normalize();
+    N[n0] = N[n0].add(n);
+    N[n1] = N[n1].add(n);
+    N[n2] = N[n2].add(n);
   }
 
   for (let i = 0; i < N.length; i++) N[i] = N[i].normalize();
