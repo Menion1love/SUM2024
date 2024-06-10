@@ -1,4 +1,4 @@
-import { mat4 } from "./mth.js";
+import { vec3, mat4 } from "./mth.js";
 import { Timer } from "./timer.js";
 let MatrWorld;
 
@@ -43,8 +43,8 @@ class Render {
     this.canvas.addEventListener("mousemove", (e) => {
       if (e.which == 1) {
         e.preventDefault();
-        this.rotateY += -e.movementY * 0.9;
-        this.rotateX += -e.movementX * 0.9;
+        this.rotateY += -e.movementY * 1.1;
+        this.rotateX += -e.movementX * 1.1;
       }
       //if (this.scale < 0.0) this.scale = 0.0;
     });
@@ -108,7 +108,7 @@ class Render {
       color += 0.08 * max(0.0, pow(dot((reflect(V, vec3(N.x, -N.y, N.z))), L), 1.0));
       color *= att;
       
-      OutColor = vec4(N, 1.0);
+      OutColor = vec4(color, 1.0);
     }
     `;
     let vs = loadShader(gl.VERTEX_SHADER, vs_txt),
@@ -196,14 +196,14 @@ class Render {
           .scale(this.scale)
           .mul(
             mat4()
-              .rotateX(this.rotateY)
+              .rotateY(this.rotateX)
               .mul(
                 mat4()
-                  .rotateY(this.rotateX)
+                  .rotateX(this.rotateY)
                   .mul(
                     mat4()
                       .translate(0, Math.sin(this.time) / 10, 0)
-                      .mul(mat4().rotateY(15 * this.time))
+                      .mul(mat4().rotateY(this.time * 45))
                   )
               )
           )

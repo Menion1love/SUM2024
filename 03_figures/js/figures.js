@@ -61,6 +61,13 @@ export function createIkosaider() {
     v2 = vec3(0, -bt, 0);
 
   let Ikosaider = [
+    // Top
+    [vec3(1, h / 2, 0), v1, vec3(cos72, h / 2, sin72)],
+    [vec3(-cos36, h / 2, sin36), v1, vec3(cos72, h / 2, sin72)],
+    [vec3(-cos36, h / 2, sin36), v1, vec3(-cos36, h / 2, -sin36)],
+    [vec3(cos72, h / 2, -sin72), v1, vec3(-cos36, h / 2, -sin36)],
+    [vec3(cos72, h / 2, -sin72), v1, vec3(1, h / 2, 0)],
+
     // Middle
     [vec3(1, h / 2, 0), vec3(cos36, -h / 2, sin36), vec3(cos72, h / 2, sin72)],
     [
@@ -109,13 +116,6 @@ export function createIkosaider() {
       vec3(1, h / 2, 0),
     ],
 
-    // Top
-    [vec3(1, h / 2, 0), v1, vec3(cos72, h / 2, sin72)],
-    [vec3(-cos36, h / 2, sin36), v1, vec3(cos72, h / 2, sin72)],
-    [vec3(-cos36, h / 2, sin36), v1, vec3(-cos36, h / 2, -sin36)],
-    [vec3(cos72, h / 2, -sin72), v1, vec3(-cos36, h / 2, -sin36)],
-    [vec3(cos72, h / 2, -sin72), v1, vec3(1, h / 2, 0)],
-
     // Bottomn
     [vec3(-1, -h / 2, 0), v2, vec3(-cos72, -h / 2, sin72)],
     [vec3(cos36, -h / 2, sin36), v2, vec3(-cos72, -h / 2, sin72)],
@@ -124,4 +124,158 @@ export function createIkosaider() {
     [vec3(-cos72, -h / 2, -sin72), v2, vec3(-1, -h / 2, 0)],
   ];
   return Ikosaider;
+}
+
+export function createDodekaedr() {
+  let verts = createIkosaider(),
+    vert = [];
+
+  for (let v in verts) {
+    let l = vec3(0);
+    for (let i = 0; i < 3; i++) {
+      l = l.add(verts[v][i]);
+    }
+    vert.push(l.div(3));
+  }
+  console.log(vert);
+  let dodekaidr = [
+    // Top
+    [
+      vert[0],
+      vert[1],
+      vert[2],
+      vert[0],
+      vert[2],
+      vert[3],
+      vert[0],
+      vert[3],
+      vert[4],
+    ],
+    // Up sight
+    [
+      vert[0],
+      vert[5],
+      vert[6],
+      vert[0],
+      vert[1],
+      vert[6],
+      vert[1],
+      vert[7],
+      vert[6],
+    ],
+    [
+      vert[1],
+      vert[7],
+      vert[8],
+      vert[1],
+      vert[2],
+      vert[8],
+      vert[8],
+      vert[9],
+      vert[2],
+    ],
+    [
+      vert[2],
+      vert[9],
+      vert[10],
+      vert[2],
+      vert[3],
+      vert[10],
+      vert[10],
+      vert[11],
+      vert[3],
+    ],
+    [
+      vert[3],
+      vert[11],
+      vert[12],
+      vert[3],
+      vert[4],
+      vert[12],
+      vert[12],
+      vert[13],
+      vert[4],
+    ],
+    [
+      vert[4],
+      vert[13],
+      vert[14],
+      vert[4],
+      vert[0],
+      vert[14],
+      vert[14],
+      vert[5],
+      vert[0],
+    ],
+    // Bottom
+    [
+      vert[15],
+      vert[16],
+      vert[17],
+      vert[15],
+      vert[17],
+      vert[18],
+      vert[15],
+      vert[18],
+      vert[19],
+    ],
+    // Down sight
+    [
+      vert[15],
+      vert[8],
+      vert[9],
+      vert[15],
+      vert[19],
+      vert[9],
+      vert[9],
+      vert[10],
+      vert[19],
+    ],
+    [
+      vert[19],
+      vert[10],
+      vert[11],
+      vert[19],
+      vert[18],
+      vert[11],
+      vert[11],
+      vert[12],
+      vert[18],
+    ],
+    [
+      vert[18],
+      vert[12],
+      vert[13],
+      vert[18],
+      vert[17],
+      vert[13],
+      vert[13],
+      vert[14],
+      vert[17],
+    ],
+    [
+      vert[17],
+      vert[14],
+      vert[5],
+      vert[17],
+      vert[16],
+      vert[5],
+      vert[5],
+      vert[6],
+      vert[16],
+    ],
+    [
+      vert[16],
+      vert[6],
+      vert[7],
+      vert[16],
+      vert[15],
+      vert[7],
+      vert[7],
+      vert[8],
+      vert[15],
+    ],
+  ];
+
+  return dodekaidr;
 }

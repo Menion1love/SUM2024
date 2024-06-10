@@ -186,6 +186,35 @@ class _mat4 {
       ];
       return this;
     });
+    this.addMethod(this, "rotate", (angel, v) => {
+      let L = D2R(angel),
+        co = Math.cos(L),
+        si = Math.sin(L);
+      let C = v.normalize();
+      let m = mat4([
+        [
+          co + C.x * C.x * (1 - co),
+          C.x * C.y * (1 - co) + C.z * si,
+          C.x * C.z * (1 - co) - C.y * si,
+          0,
+        ],
+        [
+          C.y * C.x * (1 - co) - C.z * si,
+          co + C.y * C.y * (1 - co),
+          C.y * C.z * (1 - co) + C.x * si,
+          0,
+        ],
+        [
+          C.z * C.x * (1 - co) + C.y * si,
+          0,
+          C.z * C.y * (1 - co) + C.x * si,
+          co + C.z * C.z * (1 - co),
+        ],
+        [0, 0, 0, 1],
+      ]);
+
+      return m;
+    });
     this.addMethod(this, "ortho", (l, r, b, t, n, f) => {
       this.m = [
         [2 / (r - l), 0, 0, 0],
