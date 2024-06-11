@@ -97,15 +97,15 @@ class Render {
     {
       vec3 V = normalize(DrawPos);
       vec3 N = normalize(DrawNormal);
-      vec3 L = normalize(vec3(1.0, 0.0, 0.0));
+      vec3 L = normalize(vec3(1.0, 1.0, 0.0));
       vec3 color = vec3(0.8, 0.2, 0.5);
       N = faceforward(N, V, N);
       float d = length(vec3(1.0, 1.0, 1.0));
-      float cc = 1.0, cl = 0.01, cq = 0.001; 
+      float cc = 1.0, cl = 0.1, cq = 0.01; 
       float att = min(1.0, 1.0 / (cc + cl * d + cq * d * d));        
       
-      color += 0.15 * max(0.0, dot(V, L));
-      color += 0.08 * max(0.0, pow(dot((reflect(V, vec3(N.x, -N.y, N.z))), L), 1.0));
+      color += 0.315 * max(0.0, dot(V, L));
+      color += 0.1 * max(0.0, pow(dot((reflect(V, vec3(N.x, -N.y, N.z))), L), 1.0));
       color *= att;
       
       OutColor = vec4(color, 1.0);
