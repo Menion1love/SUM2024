@@ -108,7 +108,7 @@ class Render {
       color += 0.08 * max(0.0, pow(dot((reflect(V, vec3(N.x, -N.y, N.z))), L), 1.0));
       color *= att;
       
-      OutColor = vec4(N, 1.0);
+      OutColor = vec4(color, 1.0);
     }
     `;
     let vs = loadShader(gl.VERTEX_SHADER, vs_txt),
