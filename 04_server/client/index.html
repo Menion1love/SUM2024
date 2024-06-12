@@ -2,11 +2,11 @@
 <head>
     <link rel="shortcut icon" href="./m.png" type="image/png" />
     <script src="./index.js" type="module" ></script>
+    <link rel="stylesheet" href="index.css">
 </head>
-<body>
-    <script type="module">
-        import * as damn from "./index.js";
-    </script>
-    <h2>Username:<input type="text" size="20" maxlength="150" onkeydown="damn.checkForEnter(event)"/></h3>
-    <h2>Message:<input type="text" size="20" maxlength="150"/></h2>
+<body>  
+    <div id="msg_table">
+    </div>
+    <h2 class="username">Username:<input id="name" type="text" size="20" maxlength="150"/></h2>
+    <h2 class="msg">Message:<input id="message" type="text" size="20" maxlength="150"/></h2> 
 </body>
