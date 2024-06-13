@@ -12,16 +12,17 @@ export function initGL(event) {
 
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
-    zoommouse(e.deltaY * 0.0005);
+    setzoom(e.clientX, e.clientY, e.deltaY * 0.0002);
   });
 
   canvas.addEventListener("mousemove", (e) => {
-    setcenter(e.clientX, e.clientY);
+    if (e.which == 1)
+      setcenter(e.clientX, e.clientY,)  
   });
 
   gl = canvas.getContext("webgl2");
   gl.clearColor(1, 1, 1, 1);
-  zoom = 4.0;
+  zoom = 2.0;
   centerX = 0.0;
   centerY = 0.0;
   // Shader creation
@@ -68,32 +69,24 @@ export function initGL(event) {
     
     return r;
   }
-  
-  vec2 Add( vec2 A, vec2 B )
-  {
-    vec2 r;
-    r.x = A.x + B.x;
-    r.y = A.y + B.y;
-    
-    return r;
-  }
 
   float Julia( vec2 Z, vec2 C )
   {
     float n = 0.0;
     vec2 zn = Z;
-    while ((n < 256.0) && (norm(zn) < 2.0))
+    while ((n < 256.0) && (dot(zn, zn) < 2.0))
     {
       n++;
-      zn = Add(Mull(zn, zn), C);
+      zn = Mull(zn, zn) + C;
     }
     return n;
   }
   
   void main( void )
   {
+    float s = 1.0;
     vec2 z = vec2(DrawPos.x * zoom + centerX, DrawPos.y * zoom + centerY);
-    vec2 C = vec2(0.35 + (Data.w / 10.0) * sin(Time * Data.w), 0.38 + 0.1 * sin(Time * Data.w));
+    vec2 C = vec2(0.35 + 0.1 * sin(Time * Data.w), 0.38 + 0.1 * sin(Time * Data.w));
     float n = Julia(z, C);
     OutColor = vec4(n * Data.x / 5.0, n * Data.y / 5.0, n * Data.z / 5.0, 1);
   }
@@ -110,7 +103,7 @@ export function initGL(event) {
   }
 
   // Vertex buffer creation
-  const size = 0.8;
+  const size = 1;
   const vertexes = [
     -size,
     size,
@@ -144,7 +137,7 @@ export function initGL(event) {
 
   framebuffer = gl.createBuffer();
   gl.bindBuffer(gl.UNIFORM_BUFFER, framebuffer);
-  gl.bufferData(gl.UNIFORM_BUFFER, 4 * 4, gl.STATIC_DRAW);
+  gl.bufferData(gl.UNIFORM_BUFFER, 4 * 4 * 2, gl.STATIC_DRAW);
   gl.useProgram(prg);
   gl.uniformBlockBinding(prg, gl.getUniformBlockIndex(prg, "buf"), bufID);
 } // End of 'initGL' function
@@ -164,7 +157,6 @@ function loadShader(shaderType, shaderSource) {
 // Main render frame function
 export function render() {
   gl.clear(gl.COLOR_BUFFER_BIT);
-
   gl.bindBuffer(gl.UNIFORM_BUFFER, framebuffer);
   gl.bufferData(gl.UNIFORM_BUFFER, new Float32Array(form), gl.STATIC_DRAW);
   gl.bindBufferBase(gl.UNIFORM_BUFFER, bufID, framebuffer);
@@ -178,22 +170,12 @@ export function render() {
 
     gl.uniform1f(timeLoc, t);
   }
+
   gl.uniform1f(centerXLoc, centerX);
   gl.uniform1f(centerYLoc, centerY);
   gl.uniform1f(zoomLoc, zoom);
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 } // End of 'render' function
-
-// // Zomming near function
-// export function zoomsub() {
-//   if (zoom > 0.1) zoom -= 0.05;
-//   //console.log(zoom);
-// } // End of 'zoomsub' function
-
-// // Zomming far function
-// export function zoomplus() {
-//   if (zoom < 10.0) zoom += 0.05;
-// } // End of 'zoomsub' function
 
 // Zomming far function
 export function zoommouse(scale) {
@@ -202,30 +184,29 @@ export function zoommouse(scale) {
 } // End of 'zoomsub' function
 
 // Set new center
-export function setcenter(x, y) {
-  centerX = x / 300.0 - 2;
-  centerY = -y / 300.0 + 2;
+export function setzoom(x0, y0, scale) {
+  zoom += scale;
+
+  if (zoom <= 0.0) zoom = 0.0;
+  
+  if (zoom > 0.0){
+    let x1 = centerX, y1 = centerY, s = 40;
+
+    if (scale < 0)
+    {
+      centerX += ((x0 - 505) / 505 - x1) / s;
+      centerY += (y1 - (y0 - 520) / 520) / s;
+    }
+    else {
+      centerX += (x1 - (x0 - 505) / 505) / s;
+      centerY -= (y1 - (y0 - 520) / 520) / s;
+    }
+  }
 } // End of 'setcenter' function
 
-// // Move right function
-// export function right() {
-//   centerX += 0.02;
-// } // End of 'right' function
-
-// // Move left function
-// export function left() {
-//   centerX -= 0.02;
-// } // End of 'left' function
-
-// // Move up function
-// export function up() {
-//   centerY += 0.02;
-// } // End of 'up' function
-
-// // Move down function
-// export function down() {
-//   centerY -= 0.02;
-// } // End of 'down' function
+// Set new center
+export function setcenter(x0, y0) {
+} // End of 'setcenter' function
 
 // Set color function
 export function setColor(x, y, z) {
