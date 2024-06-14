@@ -33,7 +33,7 @@ body {
 .mytable {
     background-color: gradient(#171515, purple);
     color: white;
-    width: 100vh;
+    width: 80vh;
     height: 80vh;
     max-width: 100vh;
     max-height: 80vh;

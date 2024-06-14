@@ -34,15 +34,6 @@ wss.on("connection", (ws) => {
     let ch = newm.split('') 
     if (ch[15] == 't' && ch[16] == 't' && ch[17] == 'd')
     {
-      let nik = '';
-      while (ch.shift() != 'k')
-        continue;
-      ch.shift()
-      ch.shift()
-      while (ch[0] != ' ')
-        nik += ch.shift()
-      if (users.indexOf(nik) == -1)
-        users.push(nik)
       hist.push(newm)
       for (let c in clients)
         clients[c].send(hist.join(''))
