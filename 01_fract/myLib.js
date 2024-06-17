@@ -1,28 +1,47 @@
 let form = [0.2, 0.02, 0.3, 1];
 
-let canvas, gl, timeLoc;
+let canvas, gl, timeLoc, cx, cy, oldcx, oldcy;
 
-let centerX, centerY, centerXLoc, centerYLoc, zoom, zoomLoc;
+let centerX, centerY, centerXLoc, centerYLoc, zoom, zoomLoc, dx, dy, sx, sy;
 const bufID = 5;
 let framebuffer;
 
 // OpenGL initialization function
-export function initGL(event) {
+export function initGL() {
   canvas = document.getElementById("myCan");
 
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
-    setzoom(e.clientX, e.clientY, e.deltaY * 0.0002);
+    setzoom(e.deltaY * 0.001, e.clientX ,e.clientY);
+  });
+
+  canvas.addEventListener("mousedown", (e) => {
+    if (e.which == 1)
+    {
+      cx = (e.clientX - 505) / 505, cy = (520 - e.clientY) / 520
+    }
+  });
+  
+  canvas.addEventListener("mouseup", (e) => {
+    if (e.which == 1)
+    {
+      oldcx = centerX, oldcy = centerY  
+       }
   });
 
   canvas.addEventListener("mousemove", (e) => {
+    
+    dx = (e.clientX - 505) / 505, dy = (520 - e.clientY) / 520
     if (e.which == 1)
-      setcenter(e.clientX, e.clientY,)  
+      setcenter(e.clientX, e.clientY)
   });
-
+  oldcx = 0.0
+  oldcy = 0.0
   gl = canvas.getContext("webgl2");
   gl.clearColor(1, 1, 1, 1);
-  zoom = 2.0;
+  zoom = 1.0;
+  sx = 0
+  sy = 0
   centerX = 0.0;
   centerY = 0.0;
   // Shader creation
@@ -54,12 +73,6 @@ export function initGL(event) {
   {
     vec4 Data; 
   };
-
-
-  float norm( vec2 Z )
-  {
-    return sqrt(Z.x * Z.x + Z.y * Z.y);
-  } 
   
   vec2 Mull( vec2 A, vec2 B )
   {
@@ -84,9 +97,9 @@ export function initGL(event) {
   
   void main( void )
   {
-    float s = 1.0;
+    float a;
     vec2 z = vec2(DrawPos.x * zoom + centerX, DrawPos.y * zoom + centerY);
-    vec2 C = vec2(0.35 + 0.1 * sin(Time * Data.w), 0.38 + 0.1 * sin(Time * Data.w));
+    vec2 C = vec2(0.35, 0.38);
     float n = Julia(z, C);
     OutColor = vec4(n * Data.x / 5.0, n * Data.y / 5.0, n * Data.z / 5.0, 1);
   }
@@ -177,35 +190,21 @@ export function render() {
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 } // End of 'render' function
 
-// Zomming far function
-export function zoommouse(scale) {
-  zoom += scale;
-  if (zoom <= 0.0) zoom = 0.0;
-} // End of 'zoomsub' function
-
 // Set new center
-export function setzoom(x0, y0, scale) {
-  zoom += scale;
-
-  if (zoom <= 0.0) zoom = 0.0;
-  
-  if (zoom > 0.0){
-    let x1 = centerX, y1 = centerY, s = 40;
-
-    if (scale < 0)
-    {
-      centerX += ((x0 - 505) / 505 - x1) / s;
-      centerY += (y1 - (y0 - 520) / 520) / s;
-    }
-    else {
-      centerX += (x1 - (x0 - 505) / 505) / s;
-      centerY -= (y1 - (y0 - 520) / 520) / s;
-    }
-  }
+export function setzoom(scale) {
+  zoom += zoom * scale * 0.3;
+    
+  centerX = (centerX - dx) * zoom//(1 - zoom) * dx
+  centerY = (centerY - dy) * zoom//(1 - zoom) * dy 
+ 
 } // End of 'setcenter' function
 
 // Set new center
 export function setcenter(x0, y0) {
+  let x1 = (x0 - 505) / 505, y1 = (520 - y0) / 520
+  centerX = (cx - x1) * zoom + oldcx;
+  centerY = (cy - y1) * zoom + oldcy;
+  console.log(centerX, centerY)
 } // End of 'setcenter' function
 
 // Set color function
@@ -217,7 +216,7 @@ export function setColor(x, y, z) {
 
 // Set speed function
 export function setSpeed(x) {
-  form[3] = x;
+  form[3] = 0;
 } // End of 'setSpeed' function
 
 console.log("CGSG forever!!! mylib.js imported");

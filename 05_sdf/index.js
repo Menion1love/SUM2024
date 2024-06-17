@@ -9,59 +9,58 @@ function createPix(...args) {
 }
 
 class pixel {
-    constructor (r, g, b){
-        if (r > 0 || g > 0 || b > 0)
-          this.f = 255;
-        else
-          this.f = 0;
+      constructor (r, g, b){
+          if (r > 0 || g > 0 || b > 0)
+            this.f = false;
+          else
+            this.f = true;
+      }
     }
-}
 
-function SDF() {
-  let res = 5;
+
+// function SDF() {
+//   let res = 60;
+
+//   for (let x = 1; x < data.length; x++)
+//     for (let y = 1; y < data[x].length; y++) {
+//       if (data[x][y].f == 0)
+//       {
+//         enddata[x][y].f = 0;
   
-  for (let x = 1; x < data.length; x++)
-    for (let y = 1; y < data[x].length; y++) {
-      if (data[x][y].f == 0)
-      {
-        enddata[x][y].f = 0;
-     
-        for (let t = y; t < data[x].length; t++)
-        {
-          if (enddata[x][t].f !== 0)
-            enddata[x][t].f = enddata[x][t - 1].f + res;
-        }
-        for (let t = y; t > 1; t--)
-        {
-            if (enddata[x][t].f !== 0)
-              enddata[x][t].f = enddata[x][t + 1].f + res;
+//         for (let t = y; t < y + 3; t++)
+//         {
+//           if (data[x][t].f !== 0)
+//             enddata[x][t].f = enddata[x][t - 1].f + res;
+//         }
+//         for (let t = y; t > y - 3; t--)
+//         {
+//             if (data[x][t].f !== 0)
+//               enddata[x][t].f = enddata[x][t + 1].f + res;
+//         }
 
-        }
-   
-      }   
-    }
-    
-  for (let x = 1; x < data.length; x++)
-    for (let y = 1; y < data[x].length; y++) {
-      if (data[y][x].f == 0)
-      {
-        enddata[y][x].f = 0;
-        
-        for (let t = y; t < data[x].length; t++)
-        {
-          if (enddata[t][x].f !== 0) //&& enddata[t][x].f > 127) //&& //enddata[t][x].f == 255)
-            enddata[t][x].f += (enddata[x][t - 1].f - 127);
-        }
-        for (let t = y; t > 1; t--)
-        {
-          if (enddata[t][x].f !== 0) //&& //enddata[t][x].f == 255)
-          enddata[t][x].f -= res;
+//       }   
+//     }
+ 
+  // for (let x = 1; x < data.length; x++)
+  //   for (let y = 1; y < data[x].length; y++) {
+  //     if (data[x][y].f !== 255)
+  //     {
+  //       enddata[y][x].f = data[y][x].f;
+  
+  //       for (let t = y; t < y + 3; t++)
+  //       {
+  //         if (data[t][x].f !== 0)
+  //         enddata[t][x].f = enddata[t - 1][x].f + res;
+  //       }
+  //       for (let t = y; t < y - 3; t--)
+  //       {
+  //         if (data[t][x].f !== 0)
+  //         enddata[t][x].f = enddata[t + 1][x].f + res;
+  //       }
 
-        }
-      
-      }   
-    }  
-}
+  //     }   
+  //   }  
+// }
 function conv() {
   for (let x = 0; x < data.length; x++)
     for (let y = 0; y < data[x].length; y++) {
@@ -86,7 +85,7 @@ function draw() {
       
       for (let x = 0; x < 256; x++)
       {
-        g.push(createPix(1, 1, 1))
+        g.push(createPix(2, 0, 0))
         s.push(createPix(con[pos], con[pos + 1], con[pos + 2]))
         pos += 4;    
       }  
@@ -102,8 +101,8 @@ function draw() {
     
         
   }
-  img.src = "../res/my.jpg";
-  //img.src = "../res/k.png";
+  //img.src = "../res/my.jpg";
+  img.src = "../res/j.png";
 }
 draw()
 
