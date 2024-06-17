@@ -4,9 +4,11 @@ import fsw from "node:fs/promises"
 import express from "express";
 import {WebSocketServer} from "ws";
 
+
 const hist = [];
-let cnt = 0
+const users = []
 const app = express();
+let cnt = 0;
 
 const clients = [];
 
@@ -29,15 +31,33 @@ wss.on("connection", (ws) => {
     clients[c].send(hist.join(''))
   ws.on("message", (message) => {
     let newm = message.toString()
-    hist.push(newm)
-    console.log(hist)
-    console.log(hist.join(''))
-    fsw.writeFile("./client/chat.txt", hist.join(''))
-    for (let c in clients)
-      clients[c].send(hist.join(''))
-  });
+    let ch = newm.split('') 
+    if (ch[15] == 't' && ch[16] == 't' && ch[17] == 'd')
+    {
+      hist.push(newm)
+      for (let c in clients)
+        clients[c].send(hist.join(''))
+    } 
+    else if (ch[0] = 'n' && ch[1] == 'o')
+    {
+      hist.pop()
+      for (let c in clients)
+        clients[c].send(hist.join(''))
+    } 
+    else {
+      hist.pop()
+      hist.push(newm)
+      fsw.writeFile("./client/chat.txt", hist.join(''))
+      for (let c in clients)
+        clients[c].send(hist.join(''))
+    } 
+    });
 
   ws.on("close", () => {
+    let a = hist.pop()
+    let ch = a.split('')
+    if (ch[15] != 't' && ch[16] != 't' && ch[17] != 'd')
+      hist.push(a)
     clients.pop(ws);
   })
 })
@@ -46,6 +66,7 @@ const host = "localhost";
 const port = 8000;
 
 server.listen(port, host, () => {
-  hist.push(fs.readFileSync('./client/chat.txt', 'utf8'))
+  console.log(hist.push(fs.readFileSync('./client/chat.txt', 'utf8')))
+
   console.log(`Server started on http://${host}:${port}`);
 });
