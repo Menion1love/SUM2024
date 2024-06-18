@@ -189,10 +189,15 @@ export function render() {
 
 // Set new center
 export function setzoom(scale) {
-  zoom += zoom * scale * 0.001;
+  let f = 0.05
+  if (scale < 0)
+    f = -f
 
-  centerX = (centerX - dx) * zoom;
-  centerY = (centerY - dy) * zoom;
+  zoom += zoom * f;
+
+  //centerX = (centerX - dx) * zoom - dx;
+  //centerY = (centerY - dy) * zoom - dy;
+  console.log(zoom)
 
   oldcx = centerX;
   oldcy = centerY;
