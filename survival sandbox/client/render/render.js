@@ -1,45 +1,31 @@
 import { Timer } from "./timer.js";
 import { texture } from "./resourses/tex.js"
+import { letShader } from "./resourses/shd.js"
 
-let bufID = 1;
-let framebuffer
-let form = [0.5, 0.5, 0.0, 0.0];
-let myTimer;
+let mLx, mLy; 
+
+let bufID = 0;
 
 export function rnd(...args) {
   return new Render(...args);
 }
 
 class Render {
-  framedata = [0, 0, 0, 0];
-  constructor(canvasId) {
+  constructor(canvasId, data) {
     this.canvas = document.getElementById(canvasId);
-    let gl = this.canvas.getContext("webgl2");
+    let gl = this.canvas.getContext("webgl2", { alpha: true });
     this.gl = gl;
-    
-    this.tex = new Image()
-    this.tex.src = "../res/map.png"
-    this.tex = texture(this.tex, gl)
-
-    myTimer = new Timer();
-    window.addEventListener("keydown", (e) => {
-      switch(e.which){
-        case 87: // W
-          form[1] += 0.05 * myTimer.globalDeltaTime;
-          break;
-        case 83: // S
-          form[1] -= 0.05 * myTimer.globalDeltaTime;
-          break;
-        case 65: // A
-          form[0] -= 0.05 * myTimer.globalDeltaTime;
-          break;
-        case 68: // D
-          form[0] += 0.05 * myTimer.globalDeltaTime;
-          break;
+    window.addEventListener('mousewheel', (e) => {
+      this.zoom += this.zoom * e.deltaY * 0.001});
+    if (data.texPath) {
+      this.tex = new Image()
+      this.tex.src = data.texPath
+      this.tex = texture(this.tex, gl)
     }
-    console.log(myTimer.globalDeltaTime)
-    });
-  
+    this.timer = new Timer();
+    this.type = data.type;
+    this.alpha = 0;
+    /// Keyboard handle
     // Load shaders
     const loadShader = (shaderType, shaderSource) => {
       const shader = gl.createShader(shaderType);
@@ -51,50 +37,20 @@ class Render {
       }
       return shader;
     };
-
-    // Shader creation
-    let vs_txt = `#version 300 es
-    precision highp float;
-    in vec3 InPosition;
-        
-    out vec2 DrawPos;
-    uniform float Time;
-    uniform sampler2D tex1;
-
-    uniform buf
-    {
-      vec4 Data; 
-    };  
     
-    void main( void )
-    {
-      gl_Position = vec4(InPosition, 1);
-      DrawPos = InPosition.xy;
-    }
-    `;
-    let fs_txt = `#version 300 es
-    precision highp float;
-    out vec4 OutColor;
-
-    in vec2 DrawPos;
-    uniform float Time;
-    uniform sampler2D tex1;
-
-
-    uniform buf
-    {
-      vec4 Data; 
-    };  
+    window.addEventListener('mousemove', (e) => this.onMouseMove(e))
     
-    void main( void )
-    {
-      float zoom = 0.02;
-      vec4 c = texelFetch(tex1, ivec2((DrawPos.xy * zoom + Data.xy) * vec2(3200, 1800)), 0);
-      OutColor = vec4(c);
-    }
-    `;
-    let vs = loadShader(gl.VERTEX_SHADER, vs_txt),
-      fs = loadShader(gl.FRAGMENT_SHADER, fs_txt),
+    this.keys = data.keys;
+    this.keysOld = data.keysOld;
+    this.keysClick = data.keysClick;
+    this.form = [0.5, 0.5, 0.5, 0.5]
+    this.mZ = data.mZ
+    this.mDz = data.mDz
+    this.zoom = 0.015    
+    gl.clearColor(0.5, 0.1, 0.9, 1);
+    let shd = letShader(this.type)
+    let vs = loadShader(gl.VERTEX_SHADER, shd.vs_txt),
+      fs = loadShader(gl.FRAGMENT_SHADER, shd.fs_txt),
       prg = gl.createProgram();
     gl.attachShader(prg, vs);
     gl.attachShader(prg, fs);
@@ -134,33 +90,46 @@ class Render {
     
     this.timeLoc = gl.getUniformLocation(prg, "Time");
     
-    this.texloc = gl.getUniformLocation(prg, "tex1")
-    framebuffer = gl.createBuffer();
-    gl.bindBuffer(gl.UNIFORM_BUFFER, framebuffer);
+    this.texloc = gl.getUniformLocation(prg, "tex")
+    
+    this.framebuffer = gl.createBuffer();
+    gl.bindBuffer(gl.UNIFORM_BUFFER, this.framebuffer);
     gl.bufferData(gl.UNIFORM_BUFFER, 4 * 4, gl.STATIC_DRAW);
   
     gl.useProgram(prg);
-    gl.uniformBlockBinding(prg, gl.getUniformBlockIndex(prg, "buf"), bufID);
-    
-    gl.uniform1i(this.texloc, 0);
-    gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.tex.id);
+    gl.uniformBlockBinding(prg, gl.getUniformBlockIndex(prg, "data"), 0);
+    if (this.texloc != -1 && (data.texPath != 0)) {
+      gl.uniform1i(this.texloc, 0);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.tex.id);
+    }
   }
   render() {
     const gl = this.gl;
-    myTimer.response();
-    this.time = myTimer.localTime;
+    
+    let dx = mLx - 60 - 1920 / 4, dy = mLy - 30 - 1080 / 4, d = Math.sqrt(dx * dx + dy * dy), sine = dy / d, cosine = dx / d, a = Math.atan2(sine, cosine)
+    this.form[3] = this.zoom + this.mZ
+    this.timer.response();
+    this.inputResponse()
+    this.time = this.timer.localTime;
     gl.uniform1f(this.timeLoc, this.time);
-    gl.clearColor(0.5, 0.1, 0.9, 1);
+    document.querySelector('#manCan').style.setProperty('transform', `rotate(${a * 180 / Math.PI}deg)`)
+    let w = (dx * Math.sin(a) - dx * Math.cos(a)) / 10
+    console.log(mLy)
+    if (mLx < 450)
+      document.querySelector('#manCan').style.setProperty('left', `${w}px`)
+    else 
+      document.querySelector('#manCan').style.setProperty('right', `${w}px`)
+    if (mLy > 250)
+      document.querySelector('#manCan').style.setProperty('top', `${(dy * Math.cos(a) + dy * Math.sin(a)) / 5}px`)
+    else
+      document.querySelector('#manCan').style.setProperty('bottom', `${(dy * Math.cos(a) + dy * Math.sin(a)) / 5}px`)
     
     gl.clear(gl.COLOR_BUFFER_BIT);
-    gl.bindBuffer(gl.UNIFORM_BUFFER, framebuffer);
-    gl.bufferData(gl.UNIFORM_BUFFER, new Float32Array(form), gl.STATIC_DRAW);
-    gl.bindBufferBase(gl.UNIFORM_BUFFER, bufID, framebuffer);
-    console.log(form[0])
-
+    gl.bindBuffer(gl.UNIFORM_BUFFER, this.framebuffer);
+    gl.bufferData(gl.UNIFORM_BUFFER, new Float32Array(this.form), gl.STATIC_DRAW);
+    gl.bindBufferBase(gl.UNIFORM_BUFFER, bufID, this.framebuffer);
     
-
     // Drawing
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
@@ -173,4 +142,36 @@ class Render {
     };
     draw();
   }
+      
+  inputResponse() {
+    if (this.type == "background") {
+      if (this.keys["KeyW"]) 
+        if (this.keys["KeyS"] || this.keys["KeyA"] || this.keys["KeyD"])
+          this.form[1] += 0.007 * this.timer.globalDeltaTime
+        else
+          this.form[1] += 0.01 * this.timer.globalDeltaTime
+      if (this.keys["KeyS"])
+        if (this.keys["KeyW"] || this.keys["KeyA"] || this.keys["KeyD"])
+          this.form[1] -= 0.007 * this.timer.globalDeltaTime
+        else
+          this.form[1] -= 0.01 * this.timer.globalDeltaTime 
+      if (this.keys["KeyA"])
+        if (this.keys["KeyS"] || this.keys["KeyW"] || this.keys["KeyD"])
+          this.form[0] -= 0.007 * this.timer.globalDeltaTime
+        else 
+          this.form[0] -= 0.008 * this.timer.globalDeltaTime
+      if (this.keys["KeyD"])
+        if (this.keys["KeyS"] || this.keys["KeyW"] || this.keys["KeyA"])
+          this.form[0] += 0.007 * this.timer.globalDeltaTime
+        else 
+          this.form[0] += 0.008 * this.timer.globalDeltaTime
+      if (this.keys["Enter"])
+        this.zoom = 0.015         
+  }
+}
+  onMouseMove(e) {
+    mLx = e.clientX
+    mLy = e.clientY
+  } // End of 'onMouseMove' function
+
 }
