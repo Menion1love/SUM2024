@@ -1,4 +1,4 @@
-import { rnd } from "./render/render.js";
+import { rnd, manRnd } from "./render/render.js"; 
 
 function createMan(...args) {
   return new man(...args)
@@ -23,7 +23,7 @@ class background {
     this.mDz = 0;
     this.mLx = 0;
     this.mLy = 0;
-    this.texPath = "../res/map.png"
+    this.texPath = "../res/new map.png"
     window.addEventListener("keydown", (e) => this.onKeyDown(e))
     window.addEventListener("keyup",  (e) => this.onKeyUp(e));
   }
@@ -52,7 +52,6 @@ class background {
 
 class man {
   constructor() {
-    this.type = "man"
     this.texPath = "../res/man.png"
   }
 }
@@ -60,10 +59,9 @@ class man {
 function main() {
   window.addEventListener("load", () => {
     const back = rnd("mainCan", createBack());
-    const tip = rnd("manCan", createMan());
-    
+    const tip = manRnd("manCan", createMan());
     tip.mainloop(); 
     back.mainloop();
   });
 }
-main()
+main()    

@@ -12,6 +12,7 @@
   "dependencies": {
     "express": "^4.19.2",
     "prettier": "^3.3.2",
+    "tweakpane": "^4.0.3",
     "ws": "^8.17.0"
   }
 }

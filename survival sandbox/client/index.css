@@ -27,5 +27,19 @@ body {
     height: 20%;
     image-rendering: pixelated;
     z-index: 2;
-  /* transform: rotateZ(45deg); */
+  border-radius: 50%;
+}
+.interfaceCan {
+  margin: auto;
+  display: block;
+  position: absolute;
+  top: 1%; 
+  left: 1%;
+  right: 0;
+  bottom: 0;
+    width: 50%;
+    height: 80%;
+    image-rendering: pixelated;
+    z-index: 2;
+  /* /background: rgba(212, 212, 212, 0.5); */
 }

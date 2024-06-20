@@ -72,17 +72,11 @@ class shaders {
           
         uniform sampler2D tex;
 
-        uniform data
-        {
-            vec4 Data; 
-        };  
-
         void main( void )
         {
-            float zoom = 0.1;
             vec4 c = texelFetch(tex, ivec2((DrawPos.xy + 1.0) * vec2(16, 16)), 0);
             if (c.x == 1.0 && c.y == 1.0 && c.z == 1.0)
-                OutColor = vec4(0.15, 0.15, 0.15, 0);
+                OutColor = vec4(0.03, 0.03, 0.03, 0);
             else
                 OutColor = vec4(c.xyz, 1);
         }`;
