@@ -4,14 +4,10 @@ import { letShader } from "./resourses/shd.js";
 import { genChestCoords, Checkchests } from "./game/chests.js";
 import { inputResponse } from "./input.js";
 
-let mLx, mLy, centerX, centerY, interf;
+let mLx, mLy, centerX, centerY, interf, hp = 100;
 let chestCoords;
 
 let bufID = 0;
-
-export function rnd(...args) {
-  return new backRender(...args);
-}
 
 export function interRnd(...args) {
   return new InterRender(...args) 
@@ -22,10 +18,10 @@ class InterRender {
     this.can = document.getElementById(canvasId)
     this.ctx = this.can.getContext('2d');
     this.img = new Image(); 
-    this.img.src = "../res/new map.png";
+    this.img.src = "../res/fin map.png";
     interf = false;
   }
-  response() {
+  response(rnd) {
     this.ctx.clearRect(0, 0, 1600, 900);
     if (interf) {
       document
@@ -34,16 +30,26 @@ class InterRender {
       document
       .querySelector("#interfaceCan")
       .style.setProperty("border", `1px solid black`);
-      this.ctx.drawImage(this.img, 5, 0, 640, 480);
-      this.ctx.fillStyle = 'rgba(1, 1, 0, 0.5)';
+      this.ctx.drawImage(this.img, 5, 0, 740, 580);
+      //this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
       this.ctx.strokeStyle = '#000';
       this.ctx.beginPath();
-      this.ctx.fillRect(centerX / 3200 * 640, (1800 - centerY) / 1800 * 580, 3, 5)
       
-      for (let j = 0; j < 10; j++)    {  
-        this.ctx.strokeRect(100 * j, 790, 100 * j + 100, 100)
-        this.ctx.fillRect(100 * j + 1, 790 + 1, 100 * j + 100, 100 - 1)
+      for (let i = 0; i < 3200; i++)
+        for (let j = 0; j < 1800; j++)
+          if (rnd.colmap[j][i] == 1)
+            this.ctx.fillRect(i / 3200 * 740, j / 1800 * 580, 1, 1)
+      
+      this.ctx.fillRect(centerX / 3200 * 740, centerY / 1800 * 580, 1, 1)
+      
+      for (let j = 0; j < 8; j++)    {  
+        this.ctx.strokeRect(150 * j, 750, 150 * j + 150, 150 - 10)
       }
+      this.ctx.strokeRect(50, 600,  1100, 140)
+      //  this.ctx.fillStyle = '#F00';
+      this.ctx.fillRect(50 + 1, 600 + 1, 11 * hp - 1, 138)
+      
+
       this.ctx.fill(); 
     }
     else {
@@ -70,6 +76,10 @@ function loadShader (shaderType, shaderSource, gl) {
   }
   return shader;
 };
+
+export function rnd(...args) {
+  return new backRender(...args);
+}
 
 class backRender {
   constructor(canvasId, data) {
@@ -107,13 +117,10 @@ class backRender {
     
     this.map = interRnd("interfaceCan", this.tex.src)
     chestCoords = genChestCoords()
-      
     window.addEventListener("keydown", (e) => {
       if (e.which == 32) {
         interf = !interf;
-      }
-    })
-    
+    }}) 
     // Create shaders
     let shd = letShader("background");
     let vs = loadShader(gl.VERTEX_SHADER, shd.vs_txt, gl),
@@ -177,7 +184,6 @@ class backRender {
     // Responses and uniform updates
     
     this.timer.response();
-    
     //if (interf == false)
     inputResponse(this, interf);
     centerX = this.centerX

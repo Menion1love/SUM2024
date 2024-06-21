@@ -23,7 +23,7 @@ class background {
     this.mDz = 0;
     this.mLx = 0;
     this.mLy = 0;
-    this.texPath = "../res/new map.png"
+    this.texPath = "../res/fin map.png"
     window.addEventListener("keydown", (e) => this.onKeyDown(e))
     window.addEventListener("keyup",  (e) => this.onKeyUp(e));
   }
@@ -54,7 +54,7 @@ class man {
   constructor() {
     this.texPath = "../res/man.png"
   }
-}
+  }
 
 function main() {
   window.addEventListener("load", () => {

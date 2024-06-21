@@ -15,7 +15,6 @@ wss.on("connection", (ws) => {
     console.log('bye')
   })
 })
-
 const host = "localhost";
 const port = 8000;
 
