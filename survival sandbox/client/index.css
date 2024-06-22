@@ -40,7 +40,42 @@ body {
     width: 50%;
     height: 80%;
     image-rendering: pixelated;
-    z-index: 2;
+    z-index: 3;
   /* /background: rgba(212, 212, 212, 0.5); */
 }
+.enviCan {
+  margin: auto;
+    display: block;
+  position: absolute;
+    top: 0; 
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  z-index: 2;
+  /* /background: rgba(212, 212, 212, 0.5); */
+}
+.shotCan {
+  margin: auto;
+    display: block;
+  position: absolute;
+    top: 0; 
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+  z-index: 3;
+  /* /background: rgba(212, 212, 212, 0.5); */
+}
+.intertxt {
+    font-family: "Pixelify Sans", sans-serif;
+    font-optical-sizing: auto;
+    font-weight: 22px;
+    font-style: normal;
+}
+
 

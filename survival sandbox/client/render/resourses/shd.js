@@ -12,6 +12,10 @@ class shaders {
       this.vs_txt = this.manVS();
       this.fs_txt = this.manFS();
     }
+    if (name == "enviroment") {
+      this.vs_txt = this.enviVS();
+      this.fs_txt = this.enviFS();
+    }
   }
   backVS() {
     return `#version 300 es
@@ -79,6 +83,44 @@ class shaders {
                 OutColor = vec4(0.03, 0.03, 0.03, 0);
             else
                 OutColor = vec4(c.xyz, 1);
+        }`;
+  }
+  enviVS() {
+    return `#version 300 es
+        precision highp float;
+        in vec3 InPosition;
+                
+        out vec2 DrawPos;
+        uniform sampler2D tex;
+        
+        uniform data
+        {
+          vec4 Data; 
+        };  
+        
+        void main( void )
+        {
+          gl_Position = vec4(InPosition, 1);
+          DrawPos = InPosition.xy;
+        }`;
+  }
+  enviFS() {
+    return `#version 300 es
+        precision highp float;
+        out vec4 OutColor;
+        in vec2 DrawPos;
+        
+        uniform sampler2D tex;
+        
+        uniform data
+        {
+            vec4 Data; 
+        };  
+
+        void main( void )
+        {
+            vec4 c = texelFetch(tex, ivec2((DrawPos.xy * Data[3] + Data.xy) * vec2(3200, 1800)), 0);
+            OutColor = vec4(c);
         }`;
   }
 }

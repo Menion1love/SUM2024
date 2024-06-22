@@ -1,11 +1,11 @@
 import { Timer } from "./timer.js";
 import { texture } from "./resourses/tex.js";
 import { letShader } from "./resourses/shd.js";
-import { genChestCoords, Checkchests } from "./game/chests.js";
 import { inputResponse } from "./input.js";
 
-let mLx, mLy, centerX, centerY, interf, hp = 100;
-let chestCoords;
+let mLx, mLy, centerX, centerY, interf, hp = 100, satiety = 100, form = [0.5, 0.5, 0.5, 0.5];
+
+let bullets = []
 
 let bufID = 0;
 
@@ -18,39 +18,56 @@ class InterRender {
     this.can = document.getElementById(canvasId)
     this.ctx = this.can.getContext('2d');
     this.img = new Image(); 
-    this.img.src = "../res/fin map.png";
+    this.img1 = new Image(); 
+    this.img.src = "../res/minimap.png";
+    this.img1.src = "../res/katana.png";
+    this.ctx.font = "50px Pixelify Sans";
     interf = false;
   }
-  response(rnd) {
+  response() {
     this.ctx.clearRect(0, 0, 1600, 900);
     if (interf) {
+      // Create canvas visible
       document
       .querySelector("#interfaceCan")
       .style.setProperty("background", `rgba(212, 212, 212, 0.5)`);
       document
       .querySelector("#interfaceCan")
       .style.setProperty("border", `1px solid black`);
+      
+      // Draw minimap
       this.ctx.drawImage(this.img, 5, 0, 740, 580);
-      //this.ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
-      this.ctx.strokeStyle = '#000';
       this.ctx.beginPath();
+      this.ctx.strokeStyle = '#000';
+      this.ctx.fillStyle = '#FFF';
       
-      for (let i = 0; i < 3200; i++)
-        for (let j = 0; j < 1800; j++)
-          if (rnd.colmap[j][i] == 1)
-            this.ctx.fillRect(i / 3200 * 740, j / 1800 * 580, 1, 1)
+      // Create mark
+      this.ctx.fillRect(centerX / 3200 * 740, (1800 - centerY) / 1800 * 580, 10, 10)
       
-      this.ctx.fillRect(centerX / 3200 * 740, centerY / 1800 * 580, 1, 1)
+      // Weapon rect
+      this.ctx.strokeRect(400, 750, 780, 140) 
       
-      for (let j = 0; j < 8; j++)    {  
-        this.ctx.strokeRect(150 * j, 750, 150 * j + 150, 150 - 10)
-      }
-      this.ctx.strokeRect(50, 600,  1100, 140)
-      //  this.ctx.fillStyle = '#F00';
-      this.ctx.fillRect(50 + 1, 600 + 1, 11 * hp - 1, 138)
+      // Hp rect
+      this.ctx.strokeRect(50, 670, 1100, 60)
+      this.ctx.strokeRect(50, 600, 1100, 60)
       
-
+      // Hp graf
+      this.ctx.fillStyle = '#F01';
+      this.ctx.fillRect(50 + 1, 600 + 1, 11 * hp - 1, 58)
+      this.ctx.fillStyle = '#07F';
+      this.ctx.fillRect(50 + 1, 670 + 1, 11 * satiety - 1, 58)
+      
+      // Hp text
+      this.ctx.fillStyle = '#000';
+      this.ctx.fillText(`Hp: ${hp}%`, 100, 650);
+      this.ctx.fillText(`Satiety ${satiety}%`, 100, 720);
+      
+      // Weapon text and picture
+      this.ctx.fillText(`Weapon: `, 100, 850);
+      this.ctx.drawImage(this.img1, 401, 771, 779, 98);
+      
       this.ctx.fill(); 
+
     }
     else {
       document
@@ -62,6 +79,77 @@ class InterRender {
       
       
     }
+  }
+}
+
+// function createBullet(x, y) {
+//   bullets.push([x, y])    
+// }
+
+export function shotRnd(...args) {
+  return new shotRender(...args) 
+}
+
+class shotRender {
+  constructor (canvasId) {
+    this.can = document.getElementById(canvasId)
+    this.ctx = this.can.getContext('2d');
+  }
+  response() {
+    let tga = (mLy - 1080 / 2) / Math.max((1920 / 2 - mLx), 1)  
+    this.ctx.clearRect(0, 0, 1920, 1080);
+    this.ctx.beginPath();
+    this.ctx.moveTo(0.5 * 1920, 0.5 * 1080);
+    this.ctx.lineTo(mLx, (1920 / 2 - mLx) * tga);
+    // /this.ctx.lineTo(960, 540);
+    
+    this.ctx.stroke();
+    // // this.ctx.clearRect(0, 0, 1600, 900);
+    // if (bullets.length != 0) {
+    //   // Draw minimap
+    //   this.ctx.drawImage(this.img, 5, 0, 740, 580);
+    //   this.ctx.beginPath();
+    //   this.ctx.strokeStyle = '#000';
+    //   this.ctx.fillStyle = '#FFF';
+      
+    //   // Create mark
+    //   this.ctx.fillRect(centerX / 3200 * 740, (1800 - centerY) / 1800 * 580, 10, 10)
+      
+    //   // Weapon rect
+    //   this.ctx.strokeRect(400, 750, 780, 140) 
+      
+    //   // Hp rect
+    //   this.ctx.strokeRect(50, 670, 1100, 60)
+    //   this.ctx.strokeRect(50, 600, 1100, 60)
+      
+    //   // Hp graf
+    //   this.ctx.fillStyle = '#F01';
+    //   this.ctx.fillRect(50 + 1, 600 + 1, 11 * hp - 1, 58)
+    //   this.ctx.fillStyle = '#07F';
+    //   this.ctx.fillRect(50 + 1, 670 + 1, 11 * satiety - 1, 58)
+      
+    //   // Hp text
+    //   this.ctx.fillStyle = '#000';
+    //   this.ctx.fillText(`Hp: ${hp}%`, 100, 650);
+    //   this.ctx.fillText(`Satiety ${satiety}%`, 100, 720);
+      
+    //   // Weapon text and picture
+    //   this.ctx.fillText(`Weapon: `, 100, 850);
+    //   this.ctx.drawImage(this.img1, 401, 771, 779, 98);
+      
+    //   this.ctx.fill(); 
+
+    // }
+    // else {
+    //   document
+    //   .querySelector("#interfaceCan")
+    //   .style.setProperty("border", `0px`);
+    //   document
+    //   .querySelector("#interfaceCan")
+    //   .style.setProperty("background", `rgba(212, 212, 212, 0.0)`);
+      
+      
+    // }
   }
 }
 
@@ -116,7 +204,7 @@ class backRender {
     
     
     this.map = interRnd("interfaceCan", this.tex.src)
-    chestCoords = genChestCoords()
+    this.shot = shotRnd("shotCan");
     window.addEventListener("keydown", (e) => {
       if (e.which == 32) {
         interf = !interf;
@@ -182,13 +270,16 @@ class backRender {
   render() {
     const gl = this.gl;
     // Responses and uniform updates
-    
+    this.shot.response()
     this.timer.response();
     //if (interf == false)
     inputResponse(this, interf);
     centerX = this.centerX
     centerY = this.centerY
     this.form[3] = this.zoom
+    form[0] = this.form[0]
+    form[1] = this.form[1]
+    form[3] = this.form[3]
     gl.bindBuffer(gl.UNIFORM_BUFFER, this.framebuffer);
     gl.bufferData(
       gl.UNIFORM_BUFFER,
@@ -303,6 +394,125 @@ class manRender {
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
   
+  mainloop() {
+    const draw = () => {
+      // drawing
+      this.render();
+      // animation register
+      window.requestAnimationFrame(draw);
+    };
+    draw();
+  }
+}
+
+export function enviRnd(...args) {
+  return new enviRender(...args);
+}
+
+class enviRender {
+  constructor(canvasId, data) {
+    // Create canvas and gl
+    this.canvas = document.getElementById(canvasId);
+    let gl = this.canvas.getContext("webgl2", { alpha: true });
+    this.gl = gl;
+    gl.clearColor(0.5, 0.1, 0.9, 1);
+    
+    this.tex = new Image();
+    this.tex.src = data.texPath;
+    this.tex = texture(this.tex, gl);
+
+    // Set parameters
+    this.timer = new Timer();
+    
+    this.form = [0.5, 0.5, 0.5, 0.5];
+    
+    this.centerX = 0.5 * 3200, this.centerY = 0.5 * 1800
+    this.zoom = 0.05
+    this.mZ = data.mZ;
+    this.keys = data.keys;
+    this.keysOld = data.keysOld;
+    this.keysClick = data.keysClick;
+    
+    // Create shaders
+    let shd = letShader("enviroment");
+    let vs = loadShader(gl.VERTEX_SHADER, shd.vs_txt, gl),
+      fs = loadShader(gl.FRAGMENT_SHADER, shd.fs_txt, gl),
+      prg = gl.createProgram();
+    gl.attachShader(prg, vs);
+    gl.attachShader(prg, fs);
+    gl.linkProgram(prg);
+    if (!gl.getProgramParameter(prg, gl.LINK_STATUS)) {
+      let buf = gl.getProgramInfoLog(prg);
+      console.log("Shader program link fail: " + buf);
+    }
+
+    // Vertex buffer creation
+    const size = 1;
+    const vertexes = [
+      -size,
+      size,
+      0,
+      -size,
+      -size,
+      0,
+      size,
+      size,
+      0,
+      size,
+      -size,
+      0,
+    ];
+    const posLoc = gl.getAttribLocation(prg, "InPosition");
+    let vertexArray = gl.createVertexArray();
+    gl.bindVertexArray(vertexArray);
+    let vertexBuffer = gl.createBuffer();
+    gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+    gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexes), gl.STATIC_DRAW);
+    if (posLoc != -1) {
+      gl.vertexAttribPointer(posLoc, 3, gl.FLOAT, false, 0, 0);
+      gl.enableVertexAttribArray(posLoc);
+    }
+
+    this.timeLoc = gl.getUniformLocation(prg, "Time");    
+    this.texloc = gl.getUniformLocation(prg, "tex");
+
+    // Create uniform block
+    this.framebuffer = gl.createBuffer();
+    gl.bindBuffer(gl.UNIFORM_BUFFER, this.framebuffer);
+    gl.bufferData(gl.UNIFORM_BUFFER, 4 * 4, gl.STATIC_DRAW);
+
+    gl.useProgram(prg);
+    gl.uniformBlockBinding(prg, gl.getUniformBlockIndex(prg, "data"), 0);
+    
+    // Create texture
+    if (this.texloc != -1) {
+      gl.uniform1i(this.texloc, 0);
+      gl.activeTexture(gl.TEXTURE0);
+      gl.bindTexture(gl.TEXTURE_2D, this.tex.id);
+    }
+  }
+  render() {
+    const gl = this.gl;
+    // Responses and uniform updates
+    this.timer.response();
+    
+    //if (interf == false)
+    //inputResponse(this, interf);
+   this.form[0] = form[0]
+   this.form[1] = form[1]
+    this.form[3] = form[3]
+    gl.bindBuffer(gl.UNIFORM_BUFFER, this.framebuffer);
+    gl.bufferData(
+      gl.UNIFORM_BUFFER,
+      new Float32Array(this.form),
+      gl.STATIC_DRAW
+    );
+    gl.bindBufferBase(gl.UNIFORM_BUFFER, bufID, this.framebuffer);
+    
+    // Drawing
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+  }
   mainloop() {
     const draw = () => {
       // drawing

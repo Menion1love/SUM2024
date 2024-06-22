@@ -7,22 +7,23 @@
     <meta charset="utf-8"/>
     <script src="./index.js" type="module" ></script>
     <link rel="stylesheet" href="index.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
   </head>
   <body>
-    <audio controls src='res/music/music.mp3' loop="true" autoplay="true" ></audio>
+    <audio src='res/music/music.mp3' loop="true" autoplay="true" ></audio>
     <canvas
     class="mainCan"
     id="mainCan"
     width="3200px"
     height="1800px"
-    style="border: 0px"
-    ></canvas>
+    > </canvas>
   <canvas
     class="manCan"
     id="manCan"
     width="32px"
-    height="32px"
-    style="border: 0px"  
+    height="32px"  
     ></canvas>  
   <canvas
     class="interfaceCan"
@@ -31,10 +32,22 @@
     height="900px" 
     ></canvas>    
   <canvas
-  class="colCan"
-  id="colCan"
-  width="3200px"
-  height="1800px" 
-  ></canvas>
+    class="colCan"
+    id="colCan"
+    width="3200px"
+    height="1800px" 
+    ></canvas>    
+  <canvas
+    class="enviCan"
+    id="enviCan"
+    width="3200px"
+    height="1800px" 
+    ></canvas>
+  <canvas
+    class="shotCan"
+    id="shotCan"
+    width="1920px"
+    height="1080px" 
+    ></canvas>      
   </body>
 </html>
