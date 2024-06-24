@@ -11,10 +11,8 @@ let mLx,
   hp = 100,
   satiety = 100,
   moneys,
-  pos,
+  pos, p = [960, 540],
   form = [0.5, 0.5, 0.5, 0.5];
-
-let bullets = [];
 
 let bufID = 0;
 
@@ -31,7 +29,7 @@ class InterRender {
     this.mimg = new Image();
     this.img.src = "../res/minimap.png";
     this.mimg.src = "../res/money.png";
-    this.img1.src = "../res/katana.png";
+    this.img1.src = "../res/ak.png";
     this.ctx.font = "50px Pixelify Sans";
     interf = false;
   }
@@ -83,7 +81,7 @@ class InterRender {
 
       // Weapon text and picture
       this.ctx.fillText(`Weapon: `, 100, 850);
-      this.ctx.drawImage(this.img1, 401, 771, 779, 98);
+      this.ctx.drawImage(this.img1, 601, 721, 400, 198);
 
       this.ctx.fill();
     } else {
@@ -111,13 +109,24 @@ class shotRender {
     this.ctx = this.can.getContext("2d");
   }
   response() {
-    //let tga = (mLy - 1080 / 2) / Math.max(1920 / 2 - mLx, 1);
     this.ctx.clearRect(0, 0, 1920, 1080);
     this.ctx.beginPath();
     this.ctx.moveTo(0.5 * 1920, 0.5 * 1080);
-    this.ctx.lineTo(mLx, mLy);
-    // /this.ctx.lineTo(960, 540);
-
+    let cr = [];
+    if (mLy <= 540) {
+      cr[0] = 960 - 540 * (960 - mLx) / (540 - mLy);
+      cr[1] = 0
+      if (p[0] != cr[0] && p[1] >= 0)
+        p[0] -= (960 - cr[0]) / 540 * 30, p[1] -= 30
+    }
+    else {
+      cr[0] = 960 - 540 * (960 - mLx) / (mLy - 540);
+      cr[1] = 1080;
+      if (p[0] != cr[0] && p[1] <= 1090)
+        p[0] -= (960 - cr[0]) / 540 * 10, p[1] += 10
+    }
+   
+    this.ctx.fillRect(p[0], p[1], 20, 20)
     this.ctx.stroke();
     // // this.ctx.clearRect(0, 0, 1600, 900);
     // if (bullets.length != 0) {
@@ -203,6 +212,10 @@ class backRender {
       mLx = e.pageX;
       mLy = e.pageY;
     });
+    window.addEventListener("mousedown", (e) => {
+      if (e.which == 1)
+        p[0] = 960, p[1] = 540
+    });
 
     // Set parameters
     this.moneys = 0;
@@ -220,7 +233,9 @@ class backRender {
     this.map = interRnd("interfaceCan", this.tex.src);
     this.shot = shotRnd("shotCan");
     this.chestmap = loadChests();
-
+    this.eventctx = document.getElementById("textCan").getContext("2d");;
+    
+    this.eventctx.font = '100px Arial';
     window.addEventListener("keydown", (e) => {
       if (e.which == 32) {
         interf = !interf;
@@ -287,8 +302,9 @@ class backRender {
   render() {
     const gl = this.gl;
     // Responses and uniform updates
-    this.shot.response();
     this.timer.response();
+    
+    this.shot.response();
     //if (interf == false)
     inputResponse(this, interf);
     centerX = this.centerX;

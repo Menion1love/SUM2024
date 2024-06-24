@@ -6,7 +6,12 @@ let chestmap = [],
   move;
 
 function getLoot(rnd) {
-  rnd.moneys += Math.round(Math.random() * 100 + 1);
+  rnd.eventctx.fillStyle = "#FFF";    
+  let r = Math.round(Math.random() * 100 + 1);
+  rnd.moneys += r;
+
+  rnd.eventctx.fillText(`You reached ${r} coins`, 10, 100)
+  //rnd.eventctx.fillRect(0, 0, 100, 100);
   for (let y = 0; y < 120; y++)
     for (let x = 0; x < 108; x++)
       chestmap[1800 - Math.round(rnd.centerY) + y - 60][
@@ -154,15 +159,17 @@ export function inputResponse(rnd, IsMove) {
   // Enter response (return zoom)
   if (rnd.map != undefined) rnd.map.response(rnd);
 
-  if (move) rnd.pos += 0.035;
+  if (move) rnd.pos += 0.075;
   else rnd.pos = 1;
 
   if (loadc)
     if (chestmap[1800 - Math.round(rnd.centerY)][Math.round(rnd.centerX)] == 1)
       if (rnd.keysClick["KeyE"]) {
         getLoot(rnd);
+        rnd.startTime = Math.round(rnd.time)
         console.log(rnd.moneys);
       }
-
+  if (rnd.time - rnd.startTime >= 1.5)
+    rnd.eventctx.clearRect(0, 0, 1600, 900);
   if (rnd.keys["Enter"]) rnd.zoom = 0.05;
 }
