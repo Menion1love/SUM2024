@@ -1,58 +1,56 @@
-import { rnd, manRnd, enviRnd } from "./render/render.js"; 
+import { rnd, manRnd, enviRnd } from "./render/render.js";
 
 function createMan(...args) {
-  return new man(...args)
+  return new man(...args);
 }
 
 function createBack(...args) {
-  return new background(...args)
+  return new background(...args);
 }
 
 function createEnvi(...args) {
-  return new enviroment(...args)
+  return new enviroment(...args);
 }
 
 class enviroment {
-  constructor () {
-    this.type = "enviroment"
-    
+  constructor() {
+    this.type = "enviroment";
+
     this.keys = [];
     this.keysOld = [];
     this.keysClick = [];
-    this.texPath = "../res/envi.png"
-    window.addEventListener("keydown", (e) => this.onKeyDown(e))
-    window.addEventListener("keyup",  (e) => this.onKeyUp(e));
+    this.texPath = "../res/envi.png";
+    window.addEventListener("keydown", (e) => this.onKeyDown(e));
+    window.addEventListener("keyup", (e) => this.onKeyUp(e));
   }
   onKeyDown(e) {
     this.keysOld[e.code] = this.keys[e.code];
     this.keys[e.code] = 1;
     this.keysClick[e.code] = !this.keysOld[e.code] && this.keys[e.code];
-    
+
     this.shiftKey = e.shiftKey;
     this.altKey = e.altKey;
     this.ctrlKey = e.ctrlKey;
   } // End of 'onKeyDown' function
-  
+
   onKeyUp(e) {
     this.keysOld[e.code] = this.keys[e.code];
     this.keys[e.code] = 0;
     this.keysClick[e.code] = 0;
- 
+
     this.shiftKey = e.shiftKey;
     this.altKey = e.altKey;
     this.ctrlKey = e.ctrlKey;
   } // End of 'onKeyUp' function
-  
 }
 
-
 class background {
-  constructor () {
-    this.type = "background"
+  constructor() {
+    this.type = "background";
     this.keys = [];
     this.keysOld = [];
     this.keysClick = [];
-    
+
     this.mX = 0;
     this.mY = 0;
     this.mZ = 0;
@@ -61,38 +59,37 @@ class background {
     this.mDz = 0;
     this.mLx = 0;
     this.mLy = 0;
-    this.texPath = "../res/fin map.png"
-    window.addEventListener("keydown", (e) => this.onKeyDown(e))
-    window.addEventListener("keyup",  (e) => this.onKeyUp(e));
+    this.texPath = "../res/fin map.png";
+    window.addEventListener("keydown", (e) => this.onKeyDown(e));
+    window.addEventListener("keyup", (e) => this.onKeyUp(e));
   }
-  
+
   onKeyDown(e) {
     this.keysOld[e.code] = this.keys[e.code];
     this.keys[e.code] = 1;
     this.keysClick[e.code] = !this.keysOld[e.code] && this.keys[e.code];
-      
+
     this.shiftKey = e.shiftKey;
     this.altKey = e.altKey;
     this.ctrlKey = e.ctrlKey;
   } // End of 'onKeyDown' function
-  
+
   onKeyUp(e) {
     this.keysOld[e.code] = this.keys[e.code];
     this.keys[e.code] = 0;
     this.keysClick[e.code] = 0;
- 
+
     this.shiftKey = e.shiftKey;
     this.altKey = e.altKey;
     this.ctrlKey = e.ctrlKey;
   } // End of 'onKeyUp' function
-  
 }
 
 class man {
-  constructor() { 
-    this.texPath = "../res/man.png"
+  constructor() {
+    this.texPath = "../res/man.png";
   }
-  }
+}
 
 function main() {
   window.addEventListener("load", () => {
@@ -100,9 +97,8 @@ function main() {
     const envi = enviRnd("enviCan", createEnvi());
     const tip = manRnd("manCan", createMan());
     back.mainloop();
-    envi.mainloop()
-    tip.mainloop(); 
-    
+    envi.mainloop();
+    tip.mainloop();
   });
-} 
-main()    
+}
+main();

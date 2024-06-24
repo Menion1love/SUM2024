@@ -55,36 +55,6 @@ class shaders {
             OutColor = vec4(c);
         }`;
   }
-  manVS() {
-    return `#version 300 es
-        precision highp float;
-        in vec3 InPosition;
-                
-        out vec2 DrawPos;
-
-        void main( void )
-        {
-          gl_Position = vec4(InPosition, 1);
-          DrawPos = InPosition.xy;
-        }`;
-  }
-  manFS() {
-    return `#version 300 es
-        precision highp float;
-        out vec4 OutColor;
-        in vec2 DrawPos;
-          
-        uniform sampler2D tex;
-
-        void main( void )
-        {
-            vec4 c = texelFetch(tex, ivec2((DrawPos.xy + 1.0) * vec2(16, 16)), 0);
-            if (c.x == 1.0 && c.y == 1.0 && c.z == 1.0)
-                OutColor = vec4(0.03, 0.03, 0.03, 0);
-            else
-                OutColor = vec4(c.xyz, 1);
-        }`;
-  }
   enviVS() {
     return `#version 300 es
         precision highp float;
