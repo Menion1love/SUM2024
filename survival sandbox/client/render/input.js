@@ -14,12 +14,15 @@ function getLoot(rnd) {
   //rnd.eventctx.fillRect(0, 0, 100, 100);
   for (let y = 0; y < 120; y++)
     for (let x = 0; x < 108; x++)
+      if (chestmap[1800 - Math.round(rnd.centerY) + y - 60][
+        Math.round(rnd.centerX) + x - 54
+      ] == 1)
       chestmap[1800 - Math.round(rnd.centerY) + y - 60][
         Math.round(rnd.centerX) + x - 54
       ] = 0;
 }
 
-export function loadChests() {
+export function loadChests(chests) {
   let ctx = document.getElementById("chestCan").getContext("2d");
   let img = new Image();
 
@@ -32,14 +35,16 @@ export function loadChests() {
     for (let y = 0; y < 1800; y++) {
       let s = [];
       for (let x = 0; x < 3200; x++) {
-        if (con[pos] == 0 && con[pos + 1] == 0 && con[pos + 2] == 0) s.push(1);
+        if (con[pos] == 0 && con[pos + 1] == 0 && con[pos + 2] == 0) s.push(1)
+        else if (con[pos] == 255 && con[pos + 1] == 0 && con[pos + 2] == 0) s.push(2)
+        else if (con[pos] == 0 && con[pos + 1] == 255 && con[pos + 2] == 0) s.push(3)
+        else if (con[pos] == 0 && con[pos + 1] == 0 && con[pos + 2] == 255) s.push(4)
         else s.push(0);
         pos += 4;
-      }
+        }
       chestmap.push(s);
     }
     loadc = true;
-    return chestmap;
   };
 }
 
@@ -73,7 +78,7 @@ function setcol() {
   isFirst = false;
 }
 
-export function inputResponse(rnd, IsMove) {
+export function inputResponse(rnd, IsMove, m, bat, ver, shop) {
   if (isFirst) setcol();
   move = false;
   let up = true,
@@ -106,11 +111,10 @@ export function inputResponse(rnd, IsMove) {
         right = false;
       if (!up && !down && !left && !right) up = down = left = right = true;
     }
-    console.log(up, down, left, right);
   }
 
   // Key W response
-  if (!IsMove) {
+  if (!IsMove && m && !rnd.shop) {
     if (rnd.keys["KeyW"] && up) {
       move = true;
       if (
@@ -162,14 +166,39 @@ export function inputResponse(rnd, IsMove) {
   if (move) rnd.pos += 0.075;
   else rnd.pos = 1;
 
-  if (loadc)
+  if (loadc) {
+    rnd.chestmap = chestmap
+    rnd.eventctx.fillStyle = "#FFF";    
     if (chestmap[1800 - Math.round(rnd.centerY)][Math.round(rnd.centerX)] == 1)
-      if (rnd.keysClick["KeyE"]) {
-        getLoot(rnd);
+      if (rnd.keysClick["KeyE"] && m) {
+        getLoot(rnd);  
+        
         rnd.startTime = Math.round(rnd.time)
         console.log(rnd.moneys);
       }
-  if (rnd.time - rnd.startTime >= 1.5)
+    if (chestmap[1800 - Math.round(rnd.centerY)][Math.round(rnd.centerX)] == 4)
+      if (rnd.keysClick["KeyE"] && m) {
+        
+        rnd.startTime = Math.round(rnd.time)
+        if (ver == false) {
+          rnd.eventctx.clearRect(0, 0, 1600, 900);
+          rnd.eventctx.fillText(`I need a rope!`, 10, 100)}
+      }
+    if (chestmap[1800 - Math.round(rnd.centerY)][Math.round(rnd.centerX)] == 3)
+      if (rnd.keysClick["KeyE"] && m) {
+        
+        rnd.startTime = Math.round(rnd.time)
+        if (bat == false) {
+          
+          rnd.eventctx.clearRect(0, 0, 1600, 900);
+          rnd.eventctx.fillText(`I need batteries!`, 10, 100)}
+      }
+   
+  }
+  if (rnd.time - rnd.startTime >= 1.5) {
     rnd.eventctx.clearRect(0, 0, 1600, 900);
+    rnd.startTime = 100000;
+  }
   if (rnd.keys["Enter"]) rnd.zoom = 0.05;
 }
+

@@ -23,11 +23,12 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  width: 10%;
-  height: 20%;
+  width: 20%;
+  height: 40%;
   image-rendering: pixelated;
   z-index: 2;
-  border-radius: 50%;
+  border-radius: 100%;
+  /* border: 1px solid black; */
 }
 .interfaceCan {
   margin: auto;
@@ -87,6 +88,5 @@ body {
   bottom: 0;
   width: 30%;
   height: 30%;
-  border: 1px solid black;
   z-index: 3;
 }
