@@ -13,8 +13,12 @@ let mLx,
   move = true,
   hp = 100,
   satiety = 100,
-  moneys, chests,
-  pos,
+  moneys,
+  pos, end = false,
+  scene,
+  step = 0,
+  fin = false,
+  intro = 0,
   form = [0.5, 0.5, 0.5, 0.5], time = 0, bat = false, ver = false, lcoin = false;
 
 let bufID = 0;
@@ -35,6 +39,7 @@ class InterRender {
     this.lcoin = new Image();
     this.gapple = new Image();
     this.rope = new Image();
+    this.bat = new Image();
     this.img.src = "../res/minimap.png";
     this.coin.src = "../res/money.png";
     this.img1.src = "../res/ak.png";
@@ -43,11 +48,12 @@ class InterRender {
     this.lcoin.src = "../res/lcoin.png";
     this.gapple.src = "../res/gapple.png";
     this.rope.src = "../res/rope.png";
+    this.bat.src = "../res/bat.png";
     
     this.ctx.font = "50px Pixelify Sans";
     interf = false;
   }
-  response() {
+  response(rnd) {
     this.ctx.clearRect(0, 0, 1600, 900);
     if (interf) {
       // Create canvas visible
@@ -74,7 +80,6 @@ class InterRender {
       );
 
       // Weapon rect
-      this.ctx.strokeRect(400, 750, 780, 140);
 
       // Hp rect
       this.ctx.strokeRect(50, 670, 1100, 60);
@@ -94,8 +99,13 @@ class InterRender {
       this.ctx.fillText(`Satiety ${satiety}%`, 100, 720);
 
       // Weapon text and picture
-      this.ctx.fillText(`Weapon: `, 100, 850);
-      this.ctx.drawImage(this.img1, 601, 721, 400, 198);
+      this.ctx.fillText(`Item: `, 100, 840);
+      if (ver)
+        this.ctx.drawImage(this.rope, 241, 721, 200, 200);
+      if (lcoin)
+        this.ctx.drawImage(this.lcoin, 251, 751, 130, 130);
+      if (bat)
+        this.ctx.drawImage(this.bat, 251, 751, 150, 150);
 
       this.ctx.fill();
     }
@@ -107,9 +117,19 @@ class InterRender {
       document
         .querySelector("#interfaceCan")
         .style.setProperty("border", `1px solid black`);
-      this.ctx.fillText(`Hello my friend! If you want to get batteries,`, 500, 70)
-      this.ctx.fillText(`you need to bring me the legendary coin, which `, 500, 150)
-      this.ctx.fillText(`is in the dungeon!`, 500, 230);
+      if (!lcoin && !fin) {
+        this.ctx.fillText(`Hello my friend! If you want to get batteries,`, 500, 70)
+        this.ctx.fillText(`you need to bring me the legendary coin, which `, 500, 150)
+        this.ctx.fillText(`is in the dungeon!`, 500, 230);
+      }
+      else {
+        lcoin = false; 
+        fin = true; 
+        bat = true;
+        rnd.lcoin = false;
+        this.ctx.fillText(`Oh, thank you my friend! I think you,`, 500, 70)
+        this.ctx.fillText(`deserve your batteries!`, 500, 150)  
+      }
       this.ctx.font = "50px Pixelify Sans";
       this.ctx.drawImage(this.apple, 0, 0, 200, 250);
       this.ctx.drawImage(this.coin, 250, 90, 100, 80);
@@ -160,27 +180,18 @@ class shotRender {
   constructor(canvasId) {
     this.can = document.getElementById(canvasId);
     this.ctx = this.can.getContext("2d");
+    this.ctx.fillStyle = "#FFF";
+      
   }
   response() {
-    this.ctx.clearRect(0, 0, 1920, 1080);
-    this.ctx.beginPath();
-    this.ctx.moveTo(0.5 * 1920, 0.5 * 1080);
-    let cr = [];
-    if (mLy <= 540) {
-      cr[0] = 960 - 540 * (960 - mLx) / (540 - mLy);
-      cr[1] = 0
-      if (p[0] != cr[0] && p[1] >= 0)
-        p[0] -= (960 - cr[0]) / 540 * 30, p[1] -= 30
+    this.ctx.clearRect(0, 0, 1920, 1080);  
+    if (intro == 0) {
+      this.ctx.font = "100px Pixelify Sans";
+      this.ctx.fillText(`Once upon a time...`, 550, 550);
+
+      this.ctx.font = "50px Pixelify Sans";
+      this.ctx.fillText(`Press Enter...`, 800, 1050);
     }
-    else {
-      cr[0] = 960 - 540 * (960 - mLx) / (mLy - 540);
-      cr[1] = 1080;
-      if (p[0] != cr[0] && p[1] <= 1090)
-        p[0] -= (960 - cr[0]) / 540 * 10, p[1] += 10
-    }
-   
-    this.ctx.fillRect(p[0], p[1], 20, 20)
-    this.ctx.stroke();
   }
 }
 
@@ -208,13 +219,17 @@ class backRender {
     this.gl = gl;
     gl.clearColor(0.5, 0.1, 0.9, 1);
 
-    this.tex = new Image();
-    this.tex.src = data.texPath;
-    this.tex = texture(this.tex, gl);
+    this.tex1 = new Image();
+    this.tex1.src = data.texPath;
+    this.tex1 = texture(this.tex1, gl);
+    this.tex2 = new Image();
+    this.tex2.src = "../res/secmap.png";
+    this.tex2 = texture(this.tex2, gl);
+    this.tex3 = new Image();
+    this.tex3.src = "../res/nightmap.png";
+    this.tex3 = texture(this.tex3, gl);
+    
     // Add zoom (only for debug) and mouse move func
-    window.addEventListener("mousewheel", (e) => {
-      this.zoom += this.zoom * e.deltaY * 0.001;
-    });
     window.addEventListener("mousemove", (e) => {
       mLx = e.pageX;
       mLy = e.pageY;
@@ -249,20 +264,22 @@ class backRender {
               hp = 100      
           }
         if (mLx >= 720 && mLy >= 790 && mLx <= 840 && mLy <= 870)
-          if (this.moneys >= 400 && !ver)
+          if (this.moneys >= 400 && !ver && !bat)
           {
             this.moneys -= 400;
             ver = true;
+            this.ver = true
           }
             
       }
     });
 
     // Set parameters
-    this.moneys = 1000;
+    this.moneys = 0;
     this.timer = new Timer();
     this.alpha = 0;
-    this.form = [0.8, 0.3, 0.5, 0.5];
+    this.step = 1;
+    this.form = [0.09, 0.08, 1, 0.5];
     (this.centerX = 0.5 * 3200), (this.centerY = 0.5 * 1800);
     this.keys = data.keys;
     this.keysOld = data.keysOld;
@@ -270,23 +287,29 @@ class backRender {
     this.zoom = 0.05;
     this.mZ = data.mZ;
     this.pos = 0;
-    
+    this.ver = false;
+    this.scene = false;
+    this.lcoin = false
+    this.filled = false
     this.shop = shop = false
+    this.map = interRnd("interfaceCan", this.tex1.src);
+    this.shot = shotRnd("introCan");
+    this.chestmap = loadChests();
+    this.eventctx = document.getElementById("textCan").getContext("2d");
+    this.scenetime = 0;
 
-    this.map = interRnd("interfaceCan", this.tex.src);
-    this.shot = shotRnd("shotCan");
-    this.chestmap = loadChests(chests);
-    this.eventctx = document.getElementById("textCan").getContext("2d");;
-    
     this.eventctx.font = "80px Pixelify Sans";
-    window.addEventListener("keydown", (e) => {
+    window.addEventListener("keydown", (e) => { 
       if (e.which == 32) {
         if (!shop)
           interf = !interf;
       }
-      if (e.which == 69)
+      if (e.which == 69 && (this.step == 1 || this.step == 3))
         if (this.chestmap[1800 - Math.round(centerY)][Math.round(centerX)] == 2 && !interf)
           shop = !shop, this.shop = !this.shop
+
+      if (e.which == 13)
+        intro = 1;
     });
     // Create shaders
     let shd = letShader("background");
@@ -329,7 +352,9 @@ class backRender {
     }
 
     this.timeLoc = gl.getUniformLocation(prg, "Time");
-    this.texloc = gl.getUniformLocation(prg, "tex");
+    this.texloc1 = gl.getUniformLocation(prg, "tex1");
+    this.texloc2 = gl.getUniformLocation(prg, "tex2");
+    this.texloc3 = gl.getUniformLocation(prg, "tex3");
 
     // Create uniform block
     this.framebuffer = gl.createBuffer();
@@ -340,39 +365,80 @@ class backRender {
     gl.uniformBlockBinding(prg, gl.getUniformBlockIndex(prg, "data"), 0);
 
     // Create texture
-    if (this.texloc != -1) {
-      gl.uniform1i(this.texloc, 0);
+    if (this.texloc1 != -1) {
+      gl.uniform1i(this.texloc1, 0);
       gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, this.tex.id);
+      gl.bindTexture(gl.TEXTURE_2D, this.tex1.id);
+    }
+    if (this.texloc2 != -1) {
+      gl.uniform1i(this.texloc2, 1);
+      gl.activeTexture(gl.TEXTURE0 + 1);
+      gl.bindTexture(gl.TEXTURE_2D, this.tex2.id);
+    }
+    if (this.texloc3 != -1) {
+      gl.uniform1i(this.texloc3, 2);
+      gl.activeTexture(gl.TEXTURE0 + 2);
+      gl.bindTexture(gl.TEXTURE_2D, this.tex3.id);
     }
   }
   render() {
     const gl = this.gl;
-    // Responses and uniform updates
     this.timer.response();
-    if (Math.round(this.timer.localTime) % 5 == 0 && block){
-      if (satiety == 0 && hp > 0)
-        hp -= 4
-      if (satiety >= 2)
-        satiety -= 2
-      block = false
-    }
-    if (Math.round(this.timer.localTime) % 5 != 0)
-      block = true
-
     
-    inputResponse(this, interf, move, bat, ver, shop);
+    if (this.scene) {
+      if (step == 0) {
+        if (this.form[0] <= 0.15)
+          this.form[0] += this.timer.localDeltaTime / 30, this.pos += 0.05
+        else if (this.form[0] >= 0.16)
+          this.form[0] -= this.timer.localDeltaTime / 30, this.pos += 0.05
+        else step++
+      }
+      if (step == 1)
+        if (this.form[1] >= 0.65)
+          this.form[1] -= this.timer.localDeltaTime / 30, this.pos += 0.05
+        else step++
+      if (step == 2)
+        if (this.form[0] >= 0.08)
+          this.form[0] -= this.timer.localDeltaTime / 30, this.pos += 0.05
+        else this.scenetime = this.timer.localTime, step++
+      if (step == 3) {
+        this.pos = 1;
+        if (this.timer.localTime - this.scenetime >= 2)
+          end = true
+      }
+    }
+    else{   
+      if (Math.round(this.timer.localTime) % 5 == 0 && block){
+        if (satiety == 0 && hp > 0)
+          hp -= 4
+        if (satiety >= 4)
+          satiety -= 4
+        block = false
+      }
+      if (Math.round(this.timer.localTime) % 5 != 0)
+        block = true
+      if (intro != 0)
+        inputResponse(this, interf, move, bat, ver, shop);
+    }
+      
+    // Responses and uniform updates
+    this.shot.response()   
     centerX = this.centerX;
     centerY = this.centerY;
     this.form[3] = this.zoom;
     // /this.form[3] = Math.max(Math.sin(this.timer.localTime) / 17, 0.05)
     //this.form[1] += Math.sin(this.timer.localTime) / 1000
+    this.form[2] = this.step;
     form[0] = this.form[0];
     form[1] = this.form[1];
+    form[2] = this.form[2];
     form[3] = this.form[3];
     moneys = this.moneys;
     pos = this.pos;
+    scene = this.scene;
+    lcoin = this.lcoin;
     time = this.timer.localTime;
+    ver = this.ver
     gl.bindBuffer(gl.UNIFORM_BUFFER, this.framebuffer);
     gl.bufferData(
       gl.UNIFORM_BUFFER,
@@ -412,28 +478,56 @@ class manRender {
     this.img2 = new Image();
     this.die = new Image();
     this.col = new Image();
+    this.end = new Image();
     this.img.src = "../res/pos2.png";
     this.img1.src = "../res/pos3.png";
     this.img2.src = "../res/pos1.png";
     this.die.src = "../res/die.png";
     this.col.src = "../res/coleni.png";
+    this.end.src = "../res/end.png";
     this.startTime = 0;
   }
 
   render() {
     // Count and set angel
     if(move) {
-      if (!shop) {
-        let dx = mLx - 1920 / 2,
-          dy = mLy - 1080 / 2,
-          d = Math.sqrt(dx * dx + dy * dy),
-          sine = dy / d,
-          cosine = dx / d,
-          a = Math.atan2(sine, cosine);
-        document
-          .querySelector("#manCan")
-          .style.setProperty("transform", `rotate(${(a * 180) / Math.PI}deg)`);
+      if (scene) {
+        if (step == 0 || step == 1)
+          {
+            let dx = 960 - 1920 / 2,
+            dy = 1080 - 1080 / 2,
+            d = Math.sqrt(dx * dx + dy * dy),
+            sine = dy / d,
+            cosine = dx / d,
+            a = Math.atan2(sine, cosine);
+          document
+            .querySelector("#manCan")
+            .style.setProperty("transform", `rotate(${(a * 180) / Math.PI}deg)`);
+          }
+          else if (step == 2) {
+            let dx = 0 - 1920 / 2,
+            dy = 540 - 1080 / 2,
+            d = Math.sqrt(dx * dx + dy * dy),
+            sine = dy / d,
+            cosine = dx / d,
+            a = Math.atan2(sine, cosine);
+          document
+            .querySelector("#manCan")
+            .style.setProperty("transform", `rotate(${(a * 180) / Math.PI}deg)`);
+          }
       }
+      else 
+        if (!shop) {
+          let dx = mLx - 1920 / 2,
+            dy = mLy - 1080 / 2,
+            d = Math.sqrt(dx * dx + dy * dy),
+            sine = dy / d,
+            cosine = dx / d,
+            a = Math.atan2(sine, cosine);
+          document
+            .querySelector("#manCan")
+            .style.setProperty("transform", `rotate(${(a * 180) / Math.PI}deg)`);
+        }
     }
     this.ctx.clearRect(0, 0, 64, 64);
     if (Math.floor(pos) % 4 == 0 && hp > 0) this.ctx.drawImage(this.img, 16, 16, 32, 32);
@@ -448,6 +542,10 @@ class manRender {
         this.ctx.drawImage(this.die, 16, 16, 32, 32), shop = false, interf = false;
       else
         this.ctx.drawImage(this.col, 16, 16, 32, 32), shop = false, interf = false;
+    }
+    if (end) {
+      this.ctx.clearRect(0, 0, 64, 64);  
+      this.ctx.drawImage(this.end, 16, 16, 32, 32)
     }
     // Drawing
   }
@@ -475,9 +573,15 @@ class enviRender {
     this.gl = gl;
     gl.clearColor(0.5, 0.1, 0.9, 1);
 
-    this.tex = new Image();
-    this.tex.src = data.texPath;
-    this.tex = texture(this.tex, gl);
+    this.tex1 = new Image();
+    this.tex1.src = data.texPath;
+    this.tex1 = texture(this.tex1, gl);
+    this.tex2 = new Image();
+    this.tex2.src = data.texPath;
+    this.tex2 = texture(this.tex2, gl);
+    this.tex3 = new Image();
+    this.tex3.src = "../res/nightenvi.png";
+    this.tex3 = texture(this.tex3, gl);
 
     // Set parameters
     this.timer = new Timer();
@@ -532,7 +636,6 @@ class enviRender {
     }
 
     this.timeLoc = gl.getUniformLocation(prg, "Time");
-    this.texloc = gl.getUniformLocation(prg, "tex");
 
     // Create uniform block
     this.framebuffer = gl.createBuffer();
@@ -543,10 +646,25 @@ class enviRender {
     gl.uniformBlockBinding(prg, gl.getUniformBlockIndex(prg, "data"), 0);
 
     // Create texture
-    if (this.texloc != -1) {
-      gl.uniform1i(this.texloc, 0);
+    this.texloc1 = gl.getUniformLocation(prg, "tex1");
+    this.texloc2 = gl.getUniformLocation(prg, "tex2");
+    this.texloc3 = gl.getUniformLocation(prg, "tex3");
+    
+    // Create texture
+    if (this.texloc1 != -1) {
+      gl.uniform1i(this.texloc1, 0);
       gl.activeTexture(gl.TEXTURE0);
-      gl.bindTexture(gl.TEXTURE_2D, this.tex.id);
+      gl.bindTexture(gl.TEXTURE_2D, this.tex1.id);
+    }
+    if (this.texloc2 != -1) {
+      gl.uniform1i(this.texloc2, 1);
+      gl.activeTexture(gl.TEXTURE0 + 1);
+      gl.bindTexture(gl.TEXTURE_2D, this.tex2.id);
+    }
+    if (this.texloc3 != -1) {
+      gl.uniform1i(this.texloc3, 2);
+      gl.activeTexture(gl.TEXTURE0 + 2);  
+      gl.bindTexture(gl.TEXTURE_2D, this.tex3.id);
     }
   }
   render() {
@@ -558,6 +676,7 @@ class enviRender {
     //inputResponse(this, interf);
     this.form[0] = form[0];
     this.form[1] = form[1];
+    this.form[2] = form[2];
     this.form[3] = form[3];
     gl.bindBuffer(gl.UNIFORM_BUFFER, this.framebuffer);
     gl.bufferData(

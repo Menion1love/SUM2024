@@ -23,7 +23,6 @@ class shaders {
         in vec3 InPosition;
                 
         out vec2 DrawPos;
-        uniform sampler2D tex;
         
         uniform data
         {
@@ -42,8 +41,11 @@ class shaders {
         out vec4 OutColor;
         in vec2 DrawPos;
         
-        uniform sampler2D tex;
-        
+        uniform sampler2D tex1;
+        uniform sampler2D tex2;
+        uniform sampler2D tex3;
+
+
         uniform data
         {
             vec4 Data; 
@@ -51,8 +53,19 @@ class shaders {
 
         void main( void )
         {
-            vec4 c = texelFetch(tex, ivec2((DrawPos.xy * Data[3] + Data.xy) * vec2(3200, 1800)), 0);
-            OutColor = vec4(c);
+            if (Data[2] == 1.0) {
+              vec4 c = texelFetch(tex1, ivec2((DrawPos.xy * Data[3] + Data.xy) * vec2(3200, 1800)), 0);
+              OutColor = vec4(c);
+            }
+            if (Data[2] == 2.0) {
+              vec4 c = texelFetch(tex2, ivec2((DrawPos.xy * Data[3] + Data.xy) * vec2(3200, 1800)), 0);
+              OutColor = vec4(c);
+            }
+           
+            if (Data[2] == 3.0) {
+              vec4 c = texelFetch(tex3, ivec2((DrawPos.xy * Data[3] + Data.xy) * vec2(3200, 1800)), 0);
+              OutColor = vec4(c);
+            }
         }`;
   }
   enviVS() {
@@ -61,7 +74,6 @@ class shaders {
         in vec3 InPosition;
                 
         out vec2 DrawPos;
-        uniform sampler2D tex;
         
         uniform data
         {
@@ -80,7 +92,9 @@ class shaders {
         out vec4 OutColor;
         in vec2 DrawPos;
         
-        uniform sampler2D tex;
+        uniform sampler2D tex1;
+        uniform sampler2D tex2;
+        uniform sampler2D tex3;
         
         uniform data
         {
@@ -89,8 +103,15 @@ class shaders {
 
         void main( void )
         {
-            vec4 c = texelFetch(tex, ivec2((DrawPos.xy * Data[3] + Data.xy) * vec2(3200, 1800)), 0);
-            OutColor = vec4(c);
+            if (Data[2] == 1.0) {
+              vec4 c = texelFetch(tex1, ivec2((DrawPos.xy * Data[3] + Data.xy) * vec2(3200, 1800)), 0);
+              OutColor = vec4(c);
+            }
+            if (Data[2] == 3.0) {
+              vec4 c = texelFetch(tex3, ivec2((DrawPos.xy * Data[3] + Data.xy) * vec2(3200, 1800)), 0);
+              OutColor = vec4(c);
+            }
+
         }`;
   }
 }
