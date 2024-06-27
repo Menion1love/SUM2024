@@ -1,5 +1,5 @@
 let chestmap = [];
-
+  
 export function loadChests() {
   let ctx = document.getElementById("colCan").getContext("2d");
   let img = new Image();

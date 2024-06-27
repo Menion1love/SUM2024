@@ -97,7 +97,7 @@ class Render {
     {
       vec3 V = normalize(DrawPos);
       vec3 N = normalize(DrawNormal);
-      vec3 L = normalize(vec3(1.0, 1.0, 0.0));
+      vec3 L = normalize(vec3(1.0, 1.0, -1.0));
       vec3 color = vec3(0.8, 0.2, 0.5);
       N = faceforward(N, V, N);
       float d = length(vec3(1.0, 1.0, 1.0));
@@ -186,6 +186,7 @@ class Render {
     gl.clearDepth(1.0);
 
     // Drawing
+    //gl.polygonMode(gl.FRONT_AND_BACK, );
     gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, this.cubeVerticesIndexBuffer);
     gl.drawElements(gl.TRIANGLES, this.Inds.length, gl.UNSIGNED_SHORT, 0);
   }

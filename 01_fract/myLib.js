@@ -12,8 +12,6 @@ export function initGL() {
 
   canvas.addEventListener("wheel", (e) => {
     e.preventDefault();
-    (dx = (e.clientX - 505) / 505 + oldcx),
-      (dy = (520 - e.clientY) / 520 + oldcy);
     setzoom(e.deltaY);
   });
 
@@ -30,6 +28,8 @@ export function initGL() {
   });
 
   canvas.addEventListener("mousemove", (e) => {
+    (dx = (e.clientX - 505) / 505 + oldcx),
+      (dy = (520 - e.clientY) / 520 + oldcy);
     if (e.which == 1) setcenter(e.clientX, e.clientY);
   });
   oldcx = 0.0;
@@ -195,10 +195,7 @@ export function setzoom(scale) {
 
   zoom += zoom * f;
 
-  //centerX = (centerX - dx) * zoom - dx;
-  //centerY = (centerY - dy) * zoom - dy;
-  console.log(zoom)
-
+  console.log(dx, dy, centerX, centerY)
   oldcx = centerX;
   oldcy = centerY;
 } // End of 'setcenter' function

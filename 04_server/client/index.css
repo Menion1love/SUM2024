@@ -33,8 +33,8 @@ body {
 .mytable {
     background-color: gradient(#171515, purple);
     color: white;
-    width: 100%;
-    height: 100%;
+    width: 100vh;
+    height: 80vh;
     max-width: 100vh;
     max-height: 80vh;
     text-align: left;
@@ -44,7 +44,7 @@ body {
     scrollbar-width: thin;
     scrollbar-color: purple #171515;
     scroll-behavior: smooth;
-    scroll-margin-top: 100px;
+    /* scroll-margin-top: 100px; */
     border: 3px solid purple;
     border-radius: 2%;
 }

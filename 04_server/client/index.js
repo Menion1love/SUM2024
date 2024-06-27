@@ -32,20 +32,20 @@ function initCom() {
           tf = 0;
       } 
     }
-    else {
-      if (usName != "" && !tf && e.which !== 9 && e.which !== 8 && e.which !== 20 && e.which !== 16 && e.which !== 17 && e.which !== 18){
-        tf = 1;
-        let m = '<tr><td class="ttdk">' + `${usName} is typing...` + '<td/><tr/>'
-        socket.send(m.toString())
-      }      
-  }});
+      else {
+        if (usName != "" && !tf && e.which !== 9 && e.which !== 8 && e.which !== 20 && e.which !== 16 && e.which !== 17 && e.which !== 18){
+          tf = 1;
+          let m = '<tr><td class="ttdk">' + `${usName} is typing...` + '<td/><tr/>'
+          socket.send(m.toString())
+        }      
+    }});
 
-  document.getElementById("message").addEventListener("keyup", function(e) {
-    if (e.which != 9 && document.getElementById("message").value == '' && tf == 1){
-      tf = 0
-      socket.send('no')
-    }
-  })
+    document.getElementById("message").addEventListener("keyup", function(e) {
+      if (e.which != 9 && document.getElementById("message").value == '' && tf == 1){
+        tf = 0
+        socket.send('no')
+      }
+    })
 }
 
 initCom()

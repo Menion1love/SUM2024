@@ -19,6 +19,7 @@ let mLx,
   step = 0,
   fin = false,
   intro = 0,
+  introend = 0,
   form = [0.5, 0.5, 0.5, 0.5], time = 0, bat = false, ver = false, lcoin = false;
 
 let bufID = 0;
@@ -192,6 +193,10 @@ class shotRender {
       this.ctx.font = "50px Pixelify Sans";
       this.ctx.fillText(`Press Enter...`, 800, 1050);
     }
+    if (introend) {
+      this.ctx.font = "100px Pixelify Sans";
+      this.ctx.fillText(`The end?`, 750, 550);
+    }
   }
 }
 
@@ -309,7 +314,11 @@ class backRender {
           shop = !shop, this.shop = !this.shop
 
       if (e.which == 13)
+      {
+        if (intro == 0)
+          $(".introCan").animate({ opacity: "hide" }, "slow");
         intro = 1;
+      }
     });
     // Create shaders
     let shd = letShader("background");
@@ -402,9 +411,13 @@ class backRender {
           this.form[0] -= this.timer.localDeltaTime / 30, this.pos += 0.05
         else this.scenetime = this.timer.localTime, step++
       if (step == 3) {
-        this.pos = 1;
+        this.pos = 1; 
         if (this.timer.localTime - this.scenetime >= 2)
-          end = true
+          end = true 
+        if (this.timer.localTime - this.scenetime >= 4) {
+          $(".introCan").animate({ opacity: "show" }, "slow");
+          introend = true
+        }
       }
     }
     else{   
@@ -699,4 +712,4 @@ class enviRender {
     };
     draw();
   }
-}
+} 
