@@ -228,7 +228,7 @@ export function inputResponse(rnd, IsMove, m, bat, ver, lcoin) {
   // Enter response (return zoom)
   if (rnd.map != undefined) rnd.map.response(rnd);
 
-  if (move) rnd.pos += 0.075;
+  if (move) rnd.pos += 0.065;
   else rnd.pos = 1;
 
   if (loadc && (rnd.step == 1 || rnd.step == 3)) {

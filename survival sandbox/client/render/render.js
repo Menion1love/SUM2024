@@ -43,7 +43,6 @@ class InterRender {
     this.bat = new Image();
     this.img.src = "../res/minimap.png";
     this.coin.src = "../res/money.png";
-    this.img1.src = "../res/ak.png";
     this.apple.src = "../res/apple.png";
     this.buter.src = "../res/buter.png";
     this.lcoin.src = "../res/lcoin.png";
@@ -492,6 +491,8 @@ class manRender {
     this.die = new Image();
     this.col = new Image();
     this.end = new Image();
+    this.dietime = 0;
+    this.isdie = false;
     this.img.src = "../res/pos2.png";
     this.img1.src = "../res/pos3.png";
     this.img2.src = "../res/pos1.png";
@@ -551,14 +552,30 @@ class manRender {
       if (move)
         this.startTime = time
       move = false
-      if (time - this.startTime >= 1)
+      if (time - this.startTime >= 1) {
         this.ctx.drawImage(this.die, 16, 16, 32, 32), shop = false, interf = false;
+        if (!this.isdie)
+        {
+          this.isdie = true
+          this.dietime = time
+        }
+        if (time - this.dietime >= 2) {
+          
+          $(".introCan").animate({ opacity: "show" }, "slow");
+          let can = document.getElementById("introCan").getContext("2d");
+
+          can.font = "100px Pixelify Sans";
+          can.fillText(`The end.`, 750, 550);
+        }
+      }
       else
         this.ctx.drawImage(this.col, 16, 16, 32, 32), shop = false, interf = false;
     }
     if (end) {
       this.ctx.clearRect(0, 0, 64, 64);  
       this.ctx.drawImage(this.end, 16, 16, 32, 32)
+      //this.startTime = time;
+      
     }
     // Drawing
   }
