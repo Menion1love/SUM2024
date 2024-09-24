@@ -18,13 +18,18 @@
 #include <map>
 #include "def.h"
 
+#define TERM 256
+#define CLEAR 257
+#define MAX_BITS 12 
+#define MAX (1 << MAX_BITS)
+
 /* Bits class */
 class write
 {
 public:
   std::fstream BitF;
-  CHAR BitAccum = -1000;
-  INT BitPos = 7;
+  uint8_t BitAccum = 0;
+  INT BitPos = 8;
 
   /* Write constructor function.
    * ARGUMENTS:
@@ -54,7 +59,7 @@ public:
    *
    * RETURNS: None.
    */
-  VOID bits( INT count, INT * value );
+  VOID bits( INT count, INT value );
 
   /* Write destructor.
    * ARGUMENTS: None.
@@ -118,23 +123,70 @@ public:
 class lzw
 {
 public:
-  std::map<INT, std::string> m; 
+  std::map<std::pair<INT, INT>, INT> dict; 
+  std::map<INT, std::pair<INT, INT>> dedict;
+  struct Dictory
+  {
+    INT Pref;
+    INT Suf;
+  } table[MAX];
+
+  INT START_BITS = 8; 
+  INT Code = 258; 
 
   VOID Compress( std::string Name, std::string Name1 )
   {
     read reader(Name);
-    write writer(Name);
-    INT Cur;
-    
-    while ((Cur = reader.bits(6)) != -1)
+    write writer(Name1);
+    INT Cur = reader.bits(START_BITS);
+    INT Next = 0;
+    dict.insert({{TERM, TERM}, 256});
+    dict.insert({{CLEAR, CLEAR}, 257});
+    while (Cur != -1)
     {
-      INT Next = reader.bits(6);
-      //if (Cur == Next)
-        
+      Next = reader.bits(START_BITS);
+      auto s = dict.find({Cur, Next});
+      if (s != dict.end())
+        Cur = s->second;
+      else
+      {
+        if (Next == 0)
+        {
+          dict.insert({{Cur, Next}, TERM});
+          return;
+        }
+        dict.insert({{Cur, Next}, Code});
+        dedict.insert({Code++, {Cur, Next}});
+        writer.bits(START_BITS, (CHAR)Cur);
+        //table[Code].Pref = Cur;
+        //table[Code].Pref = Next;
+        Cur = Next;
+      }    
+    }
 
+  }
+  
+  VOID DeCompress( std::string Name, std::string Name1 )
+  {
+    read reader(Name);
+    write writer(Name1);
+    INT DeCode = 0;
+    
+    while ((DeCode = reader.bits(START_BITS)) != -1)
+    {
+      CHAR Stack[MAX] {};
+
+      INT i = 0;
+      while (DeCode < 255)
+      {
+        Stack[i++] = dedict.find(DeCode)->second.first;
+        DeCode = dedict.find(DeCode)->second.first;
+      }
+      Stack[i++] = DeCode;
+      while (i-- > 0)
+        writer.bits(START_BITS, Stack[i]);
     }
   }
-
 };
 
 /* END OF 'lzw.h' FILE */

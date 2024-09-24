@@ -25,12 +25,13 @@
  */
 VOID write::bit( INT value )
 {
-  BitAccum |= value << BitPos--; 
-  if (BitPos < 0)
+  BitAccum |= value << (8 - BitPos);
+  BitPos--;
+  if (BitPos == 0)
   {
-    BitF.write(&BitAccum, 1);
+    BitF.write((CHAR *)&BitAccum, 1);
     BitAccum = 0;
-    BitPos = 7;
+    BitPos = 8;
   }
 } /* End of 'read' function */
 
@@ -40,10 +41,10 @@ VOID write::bit( INT value )
  *
  * RETURNS: None.
  */
-VOID write::bits( INT count, INT * value )
+VOID write::bits( INT count, INT value )
 {
   for (INT i = 0; i < count; i++)
-    bit(value[i]);
+    bit(((1 << i) & value) >> i);
 } /* End of 'write' function */
 
 /* Read one bit.
@@ -56,9 +57,9 @@ INT read::bit( VOID )
   if (!BitF.eof())
   {
 
-    if (BitPos < 0)
+    if (BitPos == 0)
     {
-      BitPos = 7;
+      BitPos = 8;
       BitF.read((CHAR *)&BitAccum, 1);
     }
     return (BitAccum >>  BitPos--) & 1;
@@ -75,9 +76,7 @@ INT read::bit( VOID )
  */
 INT read::bits( INT count )
 {
-  INT res;
-
-/*  INT res = 0;
+  INT res = 0;
   uint8_t tmpBit = 0;
   
   if (BitF.eof())
@@ -85,30 +84,22 @@ INT read::bits( INT count )
   
   if (BitPos < count)
   {
-    BitF.read((CHAR *)&tmpBit, 1);
+    BitF.read((CHAR *)&BitAccum, 1);
+    tmpBit = BitAccum;
+    BitPos += 8;
   }
-  if (tmpBit != 0)
-  {
-      BitPos += count;
-      BitSave = tmpBit >> (8 - BitPos);
-
-      tmpBit <<= (BitPos - count - 2);
-      BitAccum = tmpBit + BitSave;
-  }
-  else
-  {
-    BitSave <<= (8 - BitPos);
-    BitAccum += BitSave;
-  }
-
-
+  INT pos = BitPos - 8;
+  if (pos < 0)
+    BitAccum >>= abs(BitPos - 8);
+  else 
+    BitAccum <<= pos;
   CHAR maskBit = (1 << count) - 1;
 
-  res = BitAccum & maskBit;
+  res = (BitAccum + BitSave) & maskBit;
   BitAccum >>= count;
   BitPos -= count;
+  BitSave = tmpBit >> (8 - BitPos);
   return res;
-  */
 } /* End of 'write' function */
 
 /* END OF 'lzw.cpp' FILE */ 

@@ -21,15 +21,14 @@
 INT main( VOID )
 { 
   /* Catch mem hooks */
-  SetDbgMemHooks();
+  //SetDbgMemHooks();
 
-  read w("test.bin");
-//  write w1("text.txt");
-  std::cout << w.bits(8) << " ";
-  std::cout << w.bits(8) << " ";
-  std::cout << w.bits(8) << " ";
-//  std::cout << w.bits(6) << " ";
-
+  read bufr("test.bin");
+  write bufw("text.txt");
+  lzw buf;
+  buf.Compress("orwell.txt", "text.txt");
+  std::cout << "Compress done!" << std::endl;
+  //buf.DeCompress("text.txt", "test.res");
 }
 
 /* END OF 'main.cpp' FILE */
