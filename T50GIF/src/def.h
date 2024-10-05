@@ -54,10 +54,11 @@ static struct __Dummy
 #include <map>
 #include <vector>
 #include <iostream>
-#include <iterator>
 #include <fstream>
 #include <vector>
 #include <functional>
+#include <format>
+#include <array>
 
 /* 64 bit integer data type */
 typedef long long INT64;

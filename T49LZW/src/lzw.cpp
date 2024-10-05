@@ -36,9 +36,11 @@ VOID write::bit( INT value )
 } /* End of 'read' function */
 
 /* Write some bits.
- * ARGUMENTS: 
- *
- *
+ * ARGUMENTS:                          
+ *    - number of writing bit:
+ *       INT count;                    
+ *    - bit's value:
+ *       INT value;
  * RETURNS: None.
  */
 VOID write::bits( INT count, INT value )
@@ -50,21 +52,20 @@ VOID write::bits( INT count, INT value )
 /* Read one bit.
  * ARGUMENTS: None. 
  * RETURNS: 
- *    (INT) bit value.
+ *    (INT) bit value.  
  */
 INT read::bit( VOID )
 {
   if (!BitF.eof())
   {
-
-    if (BitPos == 0)
+    if (BitPos == 0 || BitPos == 8)
     {
-      BitPos = 8;
+      BitPos = 0;
       BitF.read((CHAR *)&BitAccum, 1);
     }
-    return (BitAccum >>  BitPos--) & 1;
+    return (BitAccum >> BitPos++) & 1;
   }
-  return 0;
+  return -1;
 } /* End of 'read' function */
 
 /* Write one bits.
@@ -90,16 +91,37 @@ INT read::bits( INT count )
   }
   INT pos = BitPos - 8;
   if (pos < 0)
-    BitAccum >>= abs(BitPos - 8);
+    BitAccum >>= -pos;
   else 
     BitAccum <<= pos;
-  CHAR maskBit = (1 << count) - 1;
 
-  res = (BitAccum + BitSave) & maskBit;
+  res = (BitAccum + BitSave) & ((1 << count) - 1);
   BitAccum >>= count;
   BitPos -= count;
   BitSave = tmpBit >> (8 - BitPos);
   return res;
 } /* End of 'write' function */
+
+
+/* Write one bits.
+ * ARGUMENTS: 
+ *    - number of reading bits:
+ *       INT count; 
+ * RETURNS: 
+ *   (INT) values of reading bits.
+ */
+INT read::bits2( INT count )
+{
+  INT res = 0, pos = 0;
+  
+  while (pos < count)
+  {
+    INT v = bit();
+    res |= v << pos++;
+  }
+
+  return res;
+} /* End of 'write' function */
+
 
 /* END OF 'lzw.cpp' FILE */ 

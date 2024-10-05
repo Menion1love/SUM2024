@@ -15,14 +15,13 @@
  * Computer Graphics Support Group of 30 Phys-Math Lyceum
  */
 
-#include <map>
 #include "def.h"
 
 #define TERM 256
 #define CLEAR 257
 #define MAX_BITS 12
 #define START_BITS 9
-#define MAX (1 << MAX_BITS) - 1
+#define MAX (1 << MAX_BITS)
 
 /* Bits class */
 class write

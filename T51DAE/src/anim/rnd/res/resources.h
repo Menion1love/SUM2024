@@ -3,29 +3,24 @@
  *    Computer Graphics Support Group of 30 Phys-Math Lyceum
  *************************************************************/
  
-/* FILE NAME   : main.cpp
- * PURPOSE     : Lempel-Ziv-Welch project.
- *               Main module.
+/* FILE NAME   : resources.h
+ * PURPOSE     : Animation project.
+ *               Resources declaration module.
  * PROGRAMMER  : CGSG-SummerCamp'2024.
  *               TH4.
- * LAST UPDATE : 17.09.2024.
+ * LAST UPDATE : 05.08.2024.
  * NOTE        : None.
  *
  * No part of this file may be changed without agreement of
  * Computer Graphics Support Group of 30 Phys-Math Lyceum
  */
+ 
+#ifndef __resources_h_
+#define __resources_h_
 
-#include "gif.h"
+#include "primitives/primitives.h"      
+#include "models/models.h"
 
-INT main( VOID )
-{ 
-  /* Catch mem hooks */
-  read r("test.bin");
-  lzw buf;
-  gif g;
-//  buf.Compress("orwell.txt", "text.txt");
-//  buf.DeCompress("text.txt", "text.bin");
-  g.ReadGif("1.gif");
-}
+#endif /* __resources_h_ */
 
-/* END OF 'main.cpp' FILE */
+/* END OF 'resources.h' FILE */ 

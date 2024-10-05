@@ -4,11 +4,11 @@
  *************************************************************/
  
 /* FILE NAME   : def.h
- * PURPOSE     : Lempel-Ziv-Welch project.
+ * PURPOSE     : Animation project.
  *               Common declaration module.
  * PROGRAMMER  : CGSG-SummerCamp'2024.
  *               TH4.
- * LAST UPDATE : 17.09.2024.
+ * LAST UPDATE : 30.07.2024.
  * NOTE        : None.
  *
  * No part of this file may be changed without agreement of
@@ -41,27 +41,32 @@ static struct __Dummy
 #  endif /* _CRTDBG_MAP_ALLOC */
 #endif /* _DEBUG */
 
-#ifndef WIN32
-#define WIN32
-#include <commondf.h>
-#undef WIN32
-#else
-#include <commondf.h>
-#endif
-#define BOOL bool
-
 
 #include <map>
 #include <vector>
 #include <iostream>
 #include <iterator>
 #include <fstream>
-#include <vector>
 #include <functional>
+#include <thread>
+#include <mutex>
+
+#include "mth/mth.h"
 
 /* 64 bit integer data type */
 typedef long long INT64;
 typedef unsigned long long UINT64;
+
+/* Project namespace */
+namespace tigl 
+{
+  /* Math types definitions */
+  typedef mth::vec2<FLT> vec2;   
+  typedef mth::vec3<FLT> vec3;
+  typedef mth::vec4<FLT> vec4;
+  typedef mth::matr<FLT> matr;
+  typedef mth::camera<FLT> camera;
+} /* end of 'tigl' namespace */
 
 /* Stock representation type */
 template<typename T>
@@ -84,3 +89,4 @@ template<typename T>
 #endif /* __def_h_ */
 
 /* END OF 'def.h' FILE */
+

@@ -3,29 +3,27 @@
  *    Computer Graphics Support Group of 30 Phys-Math Lyceum
  *************************************************************/
  
-/* FILE NAME   : main.cpp
- * PURPOSE     : Lempel-Ziv-Welch project.
- *               Main module.
+/* FILE NAME   : mth.h
+ * PURPOSE     : Animation project.
+ *               3D math implementation module.
  * PROGRAMMER  : CGSG-SummerCamp'2024.
  *               TH4.
- * LAST UPDATE : 17.09.2024.
+ * LAST UPDATE : 30.07.2024.
  * NOTE        : None.
  *
  * No part of this file may be changed without agreement of
  * Computer Graphics Support Group of 30 Phys-Math Lyceum
  */
 
-#include "gif.h"
+#ifndef __mth_h_
+#define __mth_h_
 
-INT main( VOID )
-{ 
-  /* Catch mem hooks */
-  read r("test.bin");
-  lzw buf;
-  gif g;
-//  buf.Compress("orwell.txt", "text.txt");
-//  buf.DeCompress("text.txt", "text.bin");
-  g.ReadGif("1.gif");
-}
+#include "mth_vec2.h"
+#include "mth_vec3.h"
+#include "mth_vec4.h"
+#include "mth_matr.h"                 
+#include "mth_cam.h"
 
-/* END OF 'main.cpp' FILE */
+#endif /* __mth_h_ */
+
+/* END OF 'mth.h' FILE */
