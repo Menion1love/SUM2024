@@ -31,7 +31,7 @@ namespace mth
       Type x, y, z; // 3D vector's directions  
     
       /* Default constructor */
-      explicit vec3( VOID ) : x(0), y(0), z(0)
+      vec3( VOID ) : x(0), y(0), z(0)
       {
       } /* End of 'vec3' function */
 

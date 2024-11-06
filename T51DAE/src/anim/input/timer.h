@@ -91,9 +91,6 @@ namespace tigl
         FrameCounter = 0;
       }
       OldTime = t.QuadPart;
-
-    //  std::cout << "FPS: " << FPS << std::endl;
-
     } /* End of 'Response' function */
   }; /* End of 'timer' class */
 } /* end of 'tigl' namespace */

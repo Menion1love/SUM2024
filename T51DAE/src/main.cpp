@@ -49,24 +49,19 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
   std::vector<std::thread> Ths;
   
-  for (INT i = 0; i < 5; i++)
+  for (INT i = 0; i < 1; i++)
     Ths.push_back(std::thread([hInstance]( VOID )
     {
       tigl::anim MyAnim1;
-      MyAnim1 << "Control" << "Test" << "Sky";
+      MyAnim1 << "Control" << "Model" << "Sky";
       MyAnim1.Run();
     }));
   for (auto &t : Ths)
     t.join();
 
   /* Create animation */
-//  tigl::anim *MyAnim; //= tigl::anim::Get();
-//
-//  *MyAnim << "Control" << "Test" << "Sky" << "Model";
-//
-//  /* Create animation */
-//  MyAnim->Run();
 } /* End of 'WinMain' function */
 
 /* END OF 'main.cpp' FILE */
 
+    

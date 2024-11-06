@@ -72,6 +72,7 @@ namespace tigl
     }
 
     model & CreateModel( const std::string &FileName );
+    model & CreateModelDae( const std::string& FileName );
 
     /* Draw array of primitives function.
      * ARGUMENTS:
@@ -96,6 +97,13 @@ namespace tigl
     {
       model *m = resource_manager::Add(model());
       m->CreateModel(NewName);
+      return m;
+    }
+
+    model* ModelCreateFromDae( const std::string& NewName)
+    {
+      model* m = resource_manager::Add(model());
+      m->CreateModelDae(NewName);
       return m;
     }
 

@@ -31,7 +31,7 @@ namespace mth
       Type x, y, z, w; // 4D vector's directions  
     
       /* Default constructor */
-      explicit vec4( VOID ) : x(0), y(0), z(0), w(0)
+      vec4( VOID ) : x(0), y(0), z(0), w(0)
       {
       } /* End of 'vec4' function */
 
@@ -343,7 +343,7 @@ namespace mth
        * RETURNS:
        *   (Type) argumnet.
        */
-      Type operator[]( const int n ) const
+      Type operator[]( const Type n ) const
       {
         if (n == 0)
           return x;

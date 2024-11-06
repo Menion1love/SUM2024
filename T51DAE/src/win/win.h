@@ -66,7 +66,7 @@ namespace tigl
      *   - default hinstainse:
      *       HINSTANCE hInst;
      */
-    win( HINSTANCE hInst = GetModuleHandle(nullptr) ) : hWnd(nullptr), hInstance(hInst), W(800), H(600), FullScreenSaveRect(RECT(0, 0, 800, 600)), MouseWheel(0), IsFullScreen(FALSE), IsActive(FALSE)
+    win( HINSTANCE hInst = GetModuleHandle(nullptr) ) : hWnd(nullptr), hInstance(hInst), W(500), H(400), FullScreenSaveRect(RECT(0, 0, 500, 400)), MouseWheel(0), IsFullScreen(FALSE), IsActive(FALSE)
     {
     } /* End of 'win' function */
 

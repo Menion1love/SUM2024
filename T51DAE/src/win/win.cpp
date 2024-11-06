@@ -65,7 +65,7 @@ VOID tigl::win::Create( VOID )
     }
   }
 
-  win::hWnd = CreateWindow(WND_CLASS_NAME, "new project damn", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 800, 600, nullptr, nullptr, win::hInstance, reinterpret_cast<VOID *>(this));
+  win::hWnd = CreateWindow(WND_CLASS_NAME, "new project damn", WS_OVERLAPPEDWINDOW, CW_USEDEFAULT, CW_USEDEFAULT, 500, 400, nullptr, nullptr, win::hInstance, reinterpret_cast<VOID *>(this));
 
   ShowWindow(win::hWnd, SW_SHOWNORMAL);
   UpdateWindow(win::hWnd);

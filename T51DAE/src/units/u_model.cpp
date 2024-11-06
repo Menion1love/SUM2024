@@ -31,7 +31,7 @@ namespace tigl
      */
     u_model( anim *Ani )
     {
-      Model = Ani->ModelCreate("bin/models/x6.g3dm");
+      Model = Ani->ModelCreateFromDae("bin/models/Zebra.dae");
     } /* End of 'u_control' function */
 
     /* Unit inter frame events handle function.
@@ -52,7 +52,7 @@ namespace tigl
      */
     VOID Render( anim *Ani ) override
     {
-      Model->ModelDraw(matr::RotateX(-90));
+      Model->ModelDraw(matr::Scale(vec3(0.1)) * matr::RotateX(-0));
     } /* End of 'Render' function */
     
     /* Unit initialization function.
