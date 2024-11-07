@@ -17,30 +17,6 @@
  
 #include "tivk.h"
 
-/* Debug output function.
- * ARGUMENTS:
- *   - source APi or device:
- *       UINT Source;
- *   - error type:
- *       UINT Type;
- *   - error message id:
- *       UINT Id, 
- *   - message severity:
- *       UINT severity, 
- *   - message text length:
- *       INT Length, 
- *   - message text:
- *       CHAR *Message, 
- *   - user addon parameters pointer:
- *       VOID *UserParam;
- * RETURNS: None.
- */
-VOID APIENTRY glDebugOutput( UINT Source, UINT Type, UINT Id, UINT Severity,
-                             INT Length, const CHAR *Message,
-                             const VOID *UserParam )
-{
-} /* End of 'glDebugOutput' function */
-
 /* Inittialization render function.
  * ARGUMENTS: None.
  * RETURNS: None.
@@ -70,9 +46,7 @@ VOID tivk::render::Init( VOID )
   Cam.FarClip = 1200.0f;
   Cam.SetLocAtUp(vec3(30), vec3(0, 0, 0));
 
-
   VlkCore.Init();
-
   buffer::ubo_camera Data {};
 
   Data.MatrP = matr::Identity();
@@ -122,7 +96,7 @@ VOID tivk::render::FrameStart( VOID )
     .y = static_cast<FLT>(VlkCore.FrameH),
     .width = static_cast<FLT>(VlkCore.FrameW),
     .height = -static_cast<FLT>(VlkCore.FrameH),
-    .minDepth = 0,
+    .minDepth = -1,
     .maxDepth = 1,
   };
   Scissor = VkRect2D
@@ -176,12 +150,7 @@ VOID tivk::render::Draw( const prim *Pr, const matr &World )
     wvp = w * Cam.VP;
   
   /* Primive UBO update */
-  tivk::buffer::ubo_prim PrimData
-  {
-   .MatrWVP = wvp,
-   .MatrW = w,
-   .MatrWInv = winv
-  };
+  tivk::buffer::ubo_prim PrimData {wvp, w, winv};
 
   Pr->PrimBuf->UpdateBuffer(&PrimData);
 

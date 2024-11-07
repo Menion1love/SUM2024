@@ -452,7 +452,7 @@ VOID tivk::vlk::CreateSwapchain( uint32_t FrameW, uint32_t FrameH, VkSwapchainKH
 
   VkDeviceMemory Memory;
 
-  ImageCreate(DepthImage, DepthImageView, Memory, reinterpret_cast<VkSampler>(nullptr), FrameW, FrameH, 0, 0, VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_LAYOUT_UNDEFINED);
+  ImageCreate(DepthImage, DepthImageView, Memory, FrameW, FrameH, 0, 0, VK_FORMAT_D32_SFLOAT, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_IMAGE_LAYOUT_UNDEFINED);
 } /* End of 'tivk::vlk::CreatesSwapchain' function */
 
 /* Creating vulkan Swapchain function.
@@ -632,7 +632,7 @@ VOID tivk::vlk::CreateFrameBuffers( VOID )
 VOID tivk::vlk::ImageCreate( VkImage &Image, VkImageView &ImageView, VkDeviceMemory &Memory,
                      INT W, INT H, BOOL IsColor, BOOL IsCube,
                      VkFormat Format, VkImageUsageFlags UsageFlags, VkImageLayout Layout,
-                     const VOID *PixelsData, UINT PixelsDataSize, UINT MipCount, VkSampler &Sampler )
+                     const VOID *PixelsData, UINT PixelsDataSize, UINT MipCount )
 {
   if (MipCount < 1)
     MipCount = 1;
@@ -690,7 +690,7 @@ VOID tivk::vlk::ImageCreate( VkImage &Image, VkImageView &ImageView, VkDeviceMem
     .components = {.r = VK_COMPONENT_SWIZZLE_IDENTITY, .g = VK_COMPONENT_SWIZZLE_IDENTITY, .b = VK_COMPONENT_SWIZZLE_IDENTITY, .a = VK_COMPONENT_SWIZZLE_IDENTITY},
     .subresourceRange
     {
-      .aspectMask = VkImageAspectFlags(IsColor ? VK_IMAGE_ASPECT_COLOR_BIT : VK_IMAGE_ASPECT_DEPTH_BIT), // ??? shadow map
+      .aspectMask = VkImageAspectFlags(IsColor ? VK_IMAGE_ASPECT_COLOR_BIT : VK_IMAGE_ASPECT_DEPTH_BIT), 
       .baseMipLevel = 0,
       .levelCount = MipCount,
       .baseArrayLayer = 0,
@@ -773,7 +773,7 @@ VOID tivk::vlk::ImageCreate( VkImage &Image, VkImageView &ImageView, VkDeviceMem
       },
     };
     vkCmdPipelineBarrier(CommandBuffer,
-      VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_HOST_BIT, 0, //VK_PIPELINE_STAGE_ALL_GRAPHICS_BIT, VK_PIPELINE_STAGE_TRANSFER_BIT,
+      VK_PIPELINE_STAGE_HOST_BIT, VK_PIPELINE_STAGE_HOST_BIT, 0, 
       0, nullptr, 0, nullptr, 1, &ImageMemoryBarrier2);
  
     vkEndCommandBuffer(CommandBuffer);
@@ -789,22 +789,6 @@ VOID tivk::vlk::ImageCreate( VkImage &Image, VkImageView &ImageView, VkDeviceMem
 
     vkQueueSubmit(GraphicsQueue, 1, &SubmitInfo, Fence);
     vkWaitForFences(Device, 1, &Fence, VK_TRUE, UINT64_MAX);
-
-    VkSamplerCreateInfo SamplerInfo
-    {
-      .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO, 
-      .magFilter = VK_FILTER_LINEAR,
-      .minFilter = VK_FILTER_LINEAR,
-      .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
-      .addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-      .addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-      .addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
-      .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
-    };
-
-    vkCreateSampler(Device, &SamplerInfo, nullptr, &Sampler);
-    Stage->imageView = ImageView;
-    Stage->imageLayout = Layout;
   }
 }  /* End of 'tivk::vlk::ImageCreate' function */
 
@@ -1045,12 +1029,51 @@ VOID tivk::vlk::CreateDescriptorSet( VOID )
     .descriptorSetCount = 1,
     .pSetLayouts = &DescriptorSetLayout,
   };
+
+  VkSamplerCreateInfo SamplerInfo
+  {
+    .sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO, 
+    .magFilter = VK_FILTER_LINEAR,
+    .minFilter = VK_FILTER_LINEAR,
+    .mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR,
+    .addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+    .addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+    .addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT,
+    .borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK,
+  };
+
+  vkCreateSampler(Device, &SamplerInfo, nullptr, &GraphicsSampler);
  
   if (vkAllocateDescriptorSets(Device, &AllocInfo, &DescriptorSet) != VK_SUCCESS)
     std::cout << "Failed to create descriptor sets" << std::endl;
 } /* End of 'tivk::vlk::CreateDescriptorSet' function */
 
-/* Create descriptor set function.
+/* Update descriptor set with buffer function.
+ * ARGUMENTS: None.
+ * RETURNS: None.
+ */
+VOID tivk::vlk::UpdateDescriptorSet( texture *Tex )
+{
+  std::array<VkWriteDescriptorSet, 1> DescriptorWrites {{}};
+
+  DescriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+  DescriptorWrites[0].dstSet = DescriptorSet;                             
+  DescriptorWrites[0].dstBinding = 3;                           
+  DescriptorWrites[0].dstArrayElement = 0;                                
+  DescriptorWrites[0].descriptorCount = 1;  
+  VkDescriptorImageInfo ImageInfo
+  {
+      .sampler = GraphicsSampler,
+      .imageView = Tex->ImageView,
+      .imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL,
+  };
+  DescriptorWrites[0].pImageInfo = &ImageInfo;
+  DescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; 
+
+  vkUpdateDescriptorSets(Device, (UINT)DescriptorWrites.size(), DescriptorWrites.data(), 0, nullptr);
+} /* End of 'tivk::vlk::CreateDescriptorSet' function */
+
+/* Update descriptor set with buffer function.
  * ARGUMENTS: None.
  * RETURNS: None.
  */
@@ -1063,42 +1086,16 @@ VOID tivk::vlk::UpdateDescriptorSet( buffer *Buf )
   DescriptorWrites[0].dstBinding = Buf->BindingPoint;                           
   DescriptorWrites[0].dstArrayElement = 0;                                
   DescriptorWrites[0].descriptorCount = 1;  
-
-  if (Buf->Type == buffer::BufferType::SAMPLER)
+  
+  VkDescriptorBufferInfo BufferInfo
   {
-    //VkDescriptorImageInfo ImageInfo
-    //{
-    //  .sampler = Stage->sampler,
-    //  .imageView = Stage->imageView,
-    //  .imageLayout = Stage->imageLayout,
-    //};
-    //DescriptorWrites[0].pImageInfo = &ImageInfo;
-    DescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER; 
-  }
-  else if (Buf->Type == buffer::BufferType::UNIFORM_BUFFER)
-  {
-    VkDescriptorBufferInfo BufferInfo
-    {
-      .buffer = Buf->Buffer,
-      .offset = 0,
-      .range = Buf->BufSize, 
-    };
+    .buffer = Buf->Buffer,
+    .offset = 0,
+    .range = Buf->BufSize, 
+  };
 
-    DescriptorWrites[0].pBufferInfo = &BufferInfo;
-    DescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; 
-  }
-  else 
-  {
-    VkDescriptorBufferInfo BufferInfo
-    {
-      .buffer = Buf->Buffer,
-      .offset = 0,
-      .range = Buf->BufSize, 
-    };
-
-    DescriptorWrites[0].pBufferInfo = &BufferInfo;
-    DescriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_STORAGE_BUFFER; 
-  }
+  DescriptorWrites[0].pBufferInfo = &BufferInfo;
+  DescriptorWrites[0].descriptorType = Buf->UsageFlag == VK_BUFFER_USAGE_STORAGE_BUFFER_BIT ? VK_DESCRIPTOR_TYPE_STORAGE_BUFFER : VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; 
   vkUpdateDescriptorSets(Device, (UINT)DescriptorWrites.size(), DescriptorWrites.data(), 0, nullptr);
 } /* End of 'tivk::vlk::InitDescriptorSet' function */
 

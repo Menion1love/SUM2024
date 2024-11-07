@@ -52,11 +52,11 @@ tivk::texture & tivk::texture::Create( const std::string &FileName )
   image img(FileName);
 
   Rnd->VlkCore.Stage = Rnd->BufferCreate<BYTE>(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, img.Pixels.data(), img.Pixels.size(), 3); 
-  VkImage a;
-  VkImageView b; 
-  VkDeviceMemory m;
-  Rnd->VlkCore.ImageCreate(a, b, m, img.W, img.H, 1, 0, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_IMAGE_LAYOUT_GENERAL, img.Pixels.data(), img.Pixels.size(), 1); 
-  Rnd->VlkCore.UpdateDescriptorSet(Rnd->VlkCore.Stage);
+  Rnd->VlkCore.ImageCreate(this->Image, this->ImageView, this->TextureMemory, img.W, img.H, 1, 0, VK_FORMAT_B8G8R8A8_SRGB, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_IMAGE_LAYOUT_UNDEFINED, img.Pixels.data(), img.Pixels.size(), 1); 
+  this->W = img.W; 
+  this->H = img.H; 
+
+  Rnd->VlkCore.UpdateDescriptorSet(this);
   Rnd->VlkCore.Stage->Free();
   return *this;
 } /* End of 'Create' function */

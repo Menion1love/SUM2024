@@ -220,8 +220,8 @@ tivk::shader & tivk::shader::LoadShader( VOID )
   VkPipelineMultisampleStateCreateInfo MSCreateInfo
   {
     .sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-    .rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,                    // При данном значении мультисэмплинг выключен,
-    .sampleShadingEnable = VK_FALSE,                                  // При данном значении цвет пикселя
+    .rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
+    .sampleShadingEnable = VK_FALSE,                                  
     .minSampleShading = 1.0f,
   };
 

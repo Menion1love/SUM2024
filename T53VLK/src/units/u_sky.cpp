@@ -38,14 +38,7 @@ namespace tivk
       const std::vector<vertex::vert> v = {{ {1, 1, 1}, {1, 1}, {1, 1, 1}, {1, 1, 1, 1} }};
 
       topology::base<vertex::vert> T(prim_type::POINTS, v, ind);
-      image Image("bin/textures/sky10.bmp");
 
-      VkImage a;
-      VkImageView b; 
-      VkDeviceMemory m;
-      Ani->VlkCore.ImageCreate(a, b, m, Image.W, Image.H, 1, 0, 
-        , VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL, Image.Pixels.data(), Image.Pixels.size(), 1); 
-      Ani->VlkCore.UpdateDescriptorSet(Ani->VlkCore.Stage);
       shd = Ani->ShdCreate("skysphere");
       M = Ani->MtlCreate("Emerald", vec3(0.0215, 0.1745, 0.0215), vec3(0.07568, 0.61424, 0.07568), vec3(0.633, 0.727811, 0.633), 76.8, 1, shd, {});
       pr = Ani->PrimCreate(T, M);

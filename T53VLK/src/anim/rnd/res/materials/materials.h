@@ -117,17 +117,6 @@ namespace tivk
       Data.KsPh = vec4(Ks, Ph);
 
       /* Set shading parameters */
-
-      /* Set textures */
-      for (INT i = 0 ; i < 8; i++)
-      {
-        if (Tex[i] != nullptr)
-          if (Tex[i]->TexId != -1)
-          {
-            Tex[i]->Apply();
-          }
-      }
-
       return Shd;
     }
 

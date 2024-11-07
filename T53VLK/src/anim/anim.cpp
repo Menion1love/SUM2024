@@ -37,8 +37,8 @@ VOID tivk::anim::OnTimer( INT Id )
  */
 BOOL tivk::anim::OnCreate( CREATESTRUCT *CS ) 
 {
-  SetTimer(win::hWnd, 47, 0, nullptr);
   tivk::render::Init();
+  SetTimer(win::hWnd, 47, 0, nullptr);
   return TRUE;
 } /* End of 'tivk::anim::OnCreate' function */
 

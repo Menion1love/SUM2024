@@ -500,9 +500,6 @@ tivk::model & tivk::model::CreateModelDae( const std::string& FileName )
   //  }
   //}
 
-
-
-
   for (INT i = 0; i < m.Source.tags.size(); i++)
     if (strcmp(m.Source.tags[i].Name.Ptr, "library_geometries") == 0)
     {

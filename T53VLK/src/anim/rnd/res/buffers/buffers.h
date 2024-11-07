@@ -71,21 +71,13 @@ namespace tivk
       BOOL Tex[8] {};
     }; /* End of 'BUF_MTL' structure */
     
-    // Core of vulklan buffer
+    // Core of vulkan buffer
     VkBuffer Buffer;
 
     // Buffers's binding point in shader
     INT BindingPoint;
-
-    // Buffer's type
-    enum BufferType : INT
-    {
-      UNIFORM_BUFFER = 0, 
-      STORAGE_BUFFER = 1, 
-      SAMPLER = 2, 
-    };
-
-    BufferType Type {};
+    
+    VkBufferUsageFlags UsageFlag;
 
     // Number of buffer quads
     UINT BufSize = 0;
@@ -103,7 +95,6 @@ namespace tivk
      */
     buffer & CreateBuffer( VkBufferUsageFlags Flags, INT Size, const INT *Data = {} );
 
-
     buffer & UpdateBufferLow( const INT *Data = {}, INT NumOfElements = 1 );
 
     template <class type_data>
@@ -118,10 +109,6 @@ namespace tivk
           return this;
         } /* End of 'BufferCreate' function */
 
-    /* Buffer delete function.
-     * ARGUMENTS: None.
-     * RETURNS: None.
-     */
     VOID Free( VOID );
   };
 
@@ -134,7 +121,6 @@ namespace tivk
     } /* End of 'buffer_manager' function */
 
   public:
-
 
     /* Create shader function.
      * ARGUMENTS:
@@ -150,13 +136,7 @@ namespace tivk
           buffer *b = resource_manager::Add(buffer());
 
           b->BindingPoint = Binding;
-          if (Flags == VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT)
-            b->Type = buffer::BufferType::UNIFORM_BUFFER;
-          else if (Flags == VK_BUFFER_USAGE_STORAGE_BUFFER_BIT)
-            b->Type = buffer::BufferType::STORAGE_BUFFER;
-          else 
-            b->Type = buffer::BufferType::SAMPLER;
-
+          b->UsageFlag = Flags;
           UINT Size = sizeof(type_data) * NumOfElements;
           INT *Pointer = new INT[Size];
           memcpy(Pointer, Data, Size);

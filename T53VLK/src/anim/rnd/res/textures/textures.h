@@ -28,15 +28,17 @@ namespace tivk
   class texture : public resource
   {
     friend class render;
+    VkDeviceMemory TextureMemory;
   public:   
     public:
     // Texture name
     std::string Name;
 
-    // Vulkan texture sampler 
-    VkSampler Sampler;
+    // Vulkan texture image 
+    VkImage Image;
+
+    // Vulkan texture image view
     VkImageView ImageView;
-    VkImageLayout ImageLayout;
 
     // Image size
     INT W = 0, H = 0;
@@ -105,7 +107,9 @@ namespace tivk
      */
     texture * CreateTexFromFile( const std::string &FileName )
     {                                       
-       return resource_manager::Add(texture().Create(FileName)); 
+       texture *tc = resource_manager::Add(texture());
+       tc->Create(FileName);
+       return tc; 
     } /* End of 'CreateTexFromFile' function */
 
     /* Texture create function.

@@ -45,17 +45,9 @@ namespace tivk
       };
 
       topology::trimesh<vertex::vert> T(v, ind);
-      image Image("Zebra.bmp");
-      Ani->VlkCore.Stage = Ani->BufferCreate<BYTE>(VK_BUFFER_USAGE_TRANSFER_SRC_BIT, Image.Pixels.data(), Image.Pixels.size(), 3); 
-      VkImage a;
-      VkImageView b; 
-      VkDeviceMemory m;
-      Ani->VlkCore.ImageCreate(a, b, m, Image.W, Image.H, 1, 0, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_USAGE_SAMPLED_BIT | VK_IMAGE_USAGE_TRANSFER_DST_BIT, VK_IMAGE_LAYOUT_UNDEFINED, Image.Pixels.data(), Image.Pixels.size(), 1); 
-      Ani->VlkCore.UpdateDescriptorSet(Ani->VlkCore.Stage);
       shd = Ani->ShdCreate("sample");
       M = Ani->MtlCreate("Emerald", vec3(0.0215, 0.1745, 0.0215), vec3(0.07568, 0.61424, 0.07568), vec3(0.633, 0.727811, 0.633), 76.8, 1, shd);
       pr = Ani->PrimCreate(T, M);
-      Ani->VlkCore.Stage->Free();
     } /* End of 'u_control' function */
 
     /* Unit inter frame events handle function.

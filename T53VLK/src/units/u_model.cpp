@@ -32,6 +32,7 @@ namespace tivk
     u_model( anim *Ani )
     {
       Model = Ani->ModelCreateFromDae("bin/models/Zebra.dae");
+      Ani->CreateTexFromFile("Zebra.bmp");
     } /* End of 'u_control' function */
 
     /* Unit inter frame events handle function.

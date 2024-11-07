@@ -71,7 +71,14 @@ namespace tivk
     /* Vilkan queues */
     VkQueue GraphicsQueue {};
     
+    /* Transfer queue */
     VkQueue TransferQueue {};
+
+    /* Graphics sampler */
+    VkSampler GraphicsSampler {};
+    
+    /* Cubemap sampler */
+    VkSampler CubemapSampler {};
 
     /* Command pool */
     VkCommandPool CommandPool {};
@@ -129,7 +136,6 @@ namespace tivk
       return Indices;
     }
 
-
     /* Creating vulkan instance function.
      * ARGUMENTS: None.
      * RETURNS: None.
@@ -172,6 +178,12 @@ namespace tivk
      */
     VOID UpdateDescriptorSet( buffer *Buf );
 
+    /* Update descriptor set with buffer function.
+     * ARGUMENTS: None.
+     * RETURNS: None.
+     */
+    VOID UpdateDescriptorSet( texture *Tex );
+
     /* Vulkan image creation function.
      * ARGUMENTS:
      *   - vulkan image handle output reference:
@@ -204,19 +216,6 @@ namespace tivk
                          INT W, INT H, BOOL IsColor, BOOL IsCube,
                          VkFormat Format, VkImageUsageFlags UsageFlags, VkImageLayout Layout,
                          const VOID *PixelsData = nullptr, UINT PixelsDataSize = 0, UINT MipCount = 1 );
-
-    /* Creating vulkan image function.
-     * ARGUMENTS: 
-     *    - image view format:
-     *       VkFormat Form;
-     *    - image to view:
-     *       VkImage Img;
-     *    - accepting flags:
-     *       VkImageAspectFlags Flags;
-     * RETURNS: 
-     *   (VkImageView) result image view.
-     */
-    VkImageView CreateImageView( VkFormat Form, VkImage Img, VkImageAspectFlags Flags );
 
     /* Creating vulkan Swapchain function.
      * ARGUMENTS: 
