@@ -45,7 +45,9 @@ VOID tivk::vlk::CreateInstance( VOID )
   {
     "VK_KHR_surface",
     "VK_KHR_win32_surface",
+#if _DEBUG
     "VK_EXT_debug_utils",
+#endif /* _DEBUG */
   };
   InstanceCreateInfo.enabledExtensionCount = (UINT32)InstanceExtensionNames.size();
   InstanceCreateInfo.ppEnabledExtensionNames = InstanceExtensionNames.data();
@@ -789,6 +791,7 @@ VOID tivk::vlk::ImageCreate( VkImage &Image, VkImageView &ImageView, VkDeviceMem
 
     vkQueueSubmit(GraphicsQueue, 1, &SubmitInfo, Fence);
     vkWaitForFences(Device, 1, &Fence, VK_TRUE, UINT64_MAX);
+    vkResetFences(Device, 1, &Fence);
   }
 }  /* End of 'tivk::vlk::ImageCreate' function */
 
@@ -948,18 +951,13 @@ VOID tivk::vlk::CreateDescriptorSet( VOID )
 {
    std::vector<VkDescriptorPoolSize> PoolSizes {};
 
-   PoolSizes.resize(4);
+   PoolSizes.resize(2);
 
    PoolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; 
    PoolSizes[0].descriptorCount = 1;
-
-   PoolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; 
-   PoolSizes[1].descriptorCount = 1;
-   PoolSizes[2].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER; 
-   PoolSizes[2].descriptorCount = 1;
-
-   PoolSizes[3].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-   PoolSizes[3].descriptorCount = 1;
+   
+   PoolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+   PoolSizes[1].descriptorCount = 8;
 
   VkDescriptorPoolCreateInfo PoolCreateInfo
   {

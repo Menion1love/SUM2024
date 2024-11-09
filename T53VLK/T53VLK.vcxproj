@@ -98,7 +98,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>X:\TGRKIT\INCLUDE;.\src; $(VULKAN_SDK)\Include;$(VULKAN_SDK)\Include\vulkan</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>tigl.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>tivk.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -117,7 +117,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>X:\TGRKIT\INCLUDE;.\src; $(VULKAN_SDK)\Include;$(VULKAN_SDK)\Include\vulkan</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>tigl.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>tivk.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -155,7 +155,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>X:\TGRKIT\INCLUDE;.\src; $(VULKAN_SDK)\Include;$(VULKAN_SDK)\Include\vulkan</AdditionalIncludeDirectories>
       <PrecompiledHeader>Use</PrecompiledHeader>
-      <PrecompiledHeaderFile>tigl.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderFile>tivk.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>

@@ -59,6 +59,7 @@ namespace tivk
     VOID Render( anim *Ani ) override
     {
       Ani->Draw(pr, matr::Scale(vec3(0.5)) * matr::RotateY(-30 * Ani->Time));
+
     } /* End of 'Render' function */
     
     /* Unit initialization function.

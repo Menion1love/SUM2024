@@ -149,7 +149,6 @@ VOID tivk::anim::Render( VOID )
 {
   tivk::timer::Response();
 
-
   if (IsActive)
     tivk::input::Response(MouseWheel);
 

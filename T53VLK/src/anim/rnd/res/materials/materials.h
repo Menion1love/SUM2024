@@ -109,8 +109,6 @@ namespace tivk
      */
     shader * Apply( VOID )
     {
-      INT prg;
-
       BUF_MTL Data;
       Data.Ka = vec4(Ka, 1);
       Data.KdTrans = vec4(Kd, Trans);

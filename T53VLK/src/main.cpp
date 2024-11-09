@@ -45,15 +45,13 @@ INT WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
   SetConsoleTextAttribute(GetStdHandle(STD_OUTPUT_HANDLE), 0xfc);
 
   /* Catch mem hooks */
-  SetDbgMemHooks();
-
   std::vector<std::thread> Ths;
   
   for (INT i = 0; i < 1; i++)
     Ths.push_back(std::thread([hInstance]( VOID )
     {
       tivk::anim MyAnim1;
-      MyAnim1 << "Control" << "Model" << "TexSample";
+      MyAnim1 << "Control" << "Model";
       MyAnim1.Run();
     }));
   for (auto &t : Ths)

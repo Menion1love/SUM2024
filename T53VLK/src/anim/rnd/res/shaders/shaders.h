@@ -68,7 +68,7 @@ namespace tivk
      * RETURNS:
      *   (shader &) self reference.
      */
-    shader & LoadShader( VOID );
+    shader & LoadShader( VkPrimitiveTopology TopologyType );
 
     /* Class default constructor */
     shader( VOID )
@@ -126,10 +126,10 @@ namespace tivk
      * RETURNS:
      *   (shader *) created primitive interface.
      */
-    shader * ShdCreate( const std::string &FileNamePrefix )
+    shader * ShdCreate( const std::string &FileNamePrefix, VkPrimitiveTopology TopologyType = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST )
     {
       shader *shd = resource_manager::Add(shader(FileNamePrefix));
-      shd->LoadShader();
+      shd->LoadShader(TopologyType);
       return shd;
     } /* End of 'ShdCreate' function */
 

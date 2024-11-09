@@ -106,7 +106,6 @@ VOID tivk::render::FrameStart( VOID )
   };
   vkCmdSetViewport(VlkCore.CommandBuffer, 0, 1, &Viewport);
   vkCmdSetScissor(VlkCore.CommandBuffer, 0, 1, &Scissor);
-
   
   buffer::ubo_camera Data
   {

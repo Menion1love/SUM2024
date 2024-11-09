@@ -56,7 +56,7 @@ std::vector<CHAR> tivk::shader::LoadTextFromFile( const std::string &FileName )
  * RETURNS:
  *   (shader &) self reference.
  */
-tivk::shader & tivk::shader::LoadShader( VOID )
+tivk::shader & tivk::shader::LoadShader( VkPrimitiveTopology TopologyType )
 {
   struct
   {
@@ -244,7 +244,7 @@ tivk::shader & tivk::shader::LoadShader( VOID )
   VkPipelineInputAssemblyStateCreateInfo IACreateInfo
   {
     .sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-    .topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+    .topology = TopologyType,
     .primitiveRestartEnable = VK_FALSE,
   };
 

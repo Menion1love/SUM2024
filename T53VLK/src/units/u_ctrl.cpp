@@ -53,9 +53,9 @@ namespace tivk
             Azi = R2D(atan2(sinP, cosP)),
             Elev = R2D(atan2(sinT, cosT));
       
-        Azi += Ani->GlobalDeltaTime * 3 * (-10.0 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 47.0 * (Ani->Keys[VK_LEFT] - Ani->Keys[VK_RIGHT]));
+        Azi += Ani->GlobalDeltaTime * 3 * (-5.0 * Ani->Keys[VK_LBUTTON] * Ani->Mdx + 47.0 * (Ani->Keys[VK_LEFT] - Ani->Keys[VK_RIGHT]));
  
-        Elev += Ani->GlobalDeltaTime * 2 * (20.0 * Ani->Keys[VK_LBUTTON] * Ani->Mdy + 47.0 * (Ani->Keys[VK_UP] - Ani->Keys[VK_DOWN]));
+        Elev += Ani->GlobalDeltaTime * 2 * (10.0 * Ani->Keys[VK_LBUTTON] * Ani->Mdy + 47.0 * (Ani->Keys[VK_UP] - Ani->Keys[VK_DOWN]));
 
         if (Elev < 0.08)
            Elev = 0.08;

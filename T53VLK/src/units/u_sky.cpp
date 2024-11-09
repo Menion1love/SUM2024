@@ -39,7 +39,8 @@ namespace tivk
 
       topology::base<vertex::vert> T(prim_type::POINTS, v, ind);
 
-      shd = Ani->ShdCreate("skysphere");
+      shd = Ani->ShdCreate("skysphere", VK_PRIMITIVE_TOPOLOGY_POINT_LIST);
+      Ani->CreateTexFromFile("bin/textures/sky10.bmp");
       M = Ani->MtlCreate("Emerald", vec3(0.0215, 0.1745, 0.0215), vec3(0.07568, 0.61424, 0.07568), vec3(0.633, 0.727811, 0.633), 76.8, 1, shd, {});
       pr = Ani->PrimCreate(T, M);
     } /* End of 'u_control' function */

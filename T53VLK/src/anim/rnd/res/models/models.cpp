@@ -128,7 +128,6 @@ namespace tivk
   /* Xml class */
   class xml
   {
-  private:
   public:
     /* File text */
     CHAR* txt;
@@ -333,13 +332,10 @@ namespace tivk
 
 tivk::model & tivk::model::CreateModelDae( const std::string& FileName )
 {
-  material* M;
-  tivk::shader* shd;
-  shd = Rnd->ShdCreate("model");
-  M = Rnd->MtlCreate("Emerald", vec3(0.0215, 0.1745, 0.0215), vec3(0.07568, 0.61424, 0.07568), vec3(0.633, 0.727811, 0.633), 76.8, 1, shd);
-  xml m;
-  tag n;
-  INT npr = 0;
+  tivk::shader *shd = Rnd->ShdCreate("model");
+  material *M = Rnd->MtlCreate("def", vec3(0), vec3(0), vec3(0), 0, 0, shd);
+  xml Xmlsrc;
+  tag CurTag;
   std::hash<str> tmp;
 
   struct DaeMtl
@@ -351,27 +347,28 @@ tivk::model & tivk::model::CreateModelDae( const std::string& FileName )
     const CHAR *Url;
 
     /* Phong coefficients */
+    FLOAT Ph; 
     vec4 Ka, Kd, Ks;
-    FLOAT Ph;
-    INT Trans;
+    INT Trans;  
 
+    /* Texture pointer*/
     texture *Tex;
 
     const CHAR *TexName;
   };
   
-  m.ReadXML(FileName);
+  Xmlsrc.ReadXML("bin/models/" + FileName + "/" + FileName +".dae");
 
   std::vector<DaeMtl> Mtls;
 
-  for (INT i = 0; i < m.Source.tags.size(); i++)
-    if (strcmp(m.Source.tags[i].Name.Ptr, "library_materials") == 0)
+  for (INT i = 0; i < Xmlsrc.Source.tags.size(); i++)
+    if (strcmp(Xmlsrc.Source.tags[i].Name.Ptr, "library_materials") == 0)
     { 
-      n = m.Source.tags[i];
+      CurTag = Xmlsrc.Source.tags[i];
       break;
     }
 
-  for (auto mtl : n.tags)
+  for (auto mtl : CurTag.tags)
   {
     DaeMtl CurMtl {};
     
@@ -388,14 +385,14 @@ tivk::model & tivk::model::CreateModelDae( const std::string& FileName )
     Mtls.push_back(CurMtl);
   }
 
-  for (INT i = 0; i < m.Source.tags.size(); i++)
-    if (strcmp(m.Source.tags[i].Name.Ptr, "library_effects") == 0)
+  for (INT i = 0; i < Xmlsrc.Source.tags.size(); i++)
+    if (strcmp(Xmlsrc.Source.tags[i].Name.Ptr, "library_effects") == 0)
     {
-      n = m.Source.tags[i];
+      CurTag = Xmlsrc.Source.tags[i];
       break;
     }
 
-  for (auto eff : n.tags)
+  for (auto eff : CurTag.tags)
   {
     auto a = eff.args.find(tmp(str("id")));
     const CHAR* id = a->second.Ptr;
@@ -480,30 +477,30 @@ tivk::model & tivk::model::CreateModelDae( const std::string& FileName )
     }  
   }
 
-  //for (INT i = 0; i < m.Source.tags.size(); i++)
-  //  if (strcmp(m.Source.tags[i].Name.Ptr, "library_images") == 0)
-  //  {
-  //    n = m.Source.tags[i];
-  //    break;
-  //  }
-  //
-  //for (auto im : n.tags)
-  //{
-  //  auto a = im.args.find(tmp(str("id")));
-  //  const CHAR* id = a->second.Ptr;
-  //  
-  //  for (INT i = 0; i < Mtls.size(); i++)
-  //  {
-  //    if (Mtls[i].TexName != nullptr)
-  //      if (strcmp(Mtls[i].TexName, id) == 0)
-  //        Mtls[i].Tex = Rnd->CreateTexFromFile(im.tags[0].content.Ptr);
-  //  }
-  //}
-
-  for (INT i = 0; i < m.Source.tags.size(); i++)
-    if (strcmp(m.Source.tags[i].Name.Ptr, "library_geometries") == 0)
+  for (INT i = 0; i < Xmlsrc.Source.tags.size(); i++)
+    if (strcmp(Xmlsrc.Source.tags[i].Name.Ptr, "library_images") == 0)
     {
-      n = m.Source.tags[i];
+      CurTag = Xmlsrc.Source.tags[i];
+      break;
+    }
+  
+  for (auto im : CurTag.tags)
+  {
+    auto a = im.args.find(tmp(str("id")));
+    const CHAR* id = a->second.Ptr;
+    
+    for (INT i = 0; i < Mtls.size(); i++)
+    {
+      if (Mtls[i].TexName != nullptr)
+        if (strcmp(Mtls[i].TexName, id) == 0)
+          Mtls[i].Tex = Rnd->CreateTexFromFile("bin/models/" + FileName + "/" + im.tags[0].content.Ptr);
+    }
+  }
+
+  for (INT i = 0; i < Xmlsrc.Source.tags.size(); i++)
+    if (strcmp(Xmlsrc.Source.tags[i].Name.Ptr, "library_geometries") == 0)
+    {
+      CurTag = Xmlsrc.Source.tags[i];
       break;
     }
 
@@ -539,7 +536,7 @@ tivk::model & tivk::model::CreateModelDae( const std::string& FileName )
     INT Stride;
   }; /* End of 'Geometry' struct */
 
-  for (auto geoms : n.tags)
+  for (auto geoms : CurTag.tags)
   {
     std::vector<Geometry> geom;
 
@@ -799,7 +796,7 @@ tivk::model & tivk::model::CreateModelDae( const std::string& FileName )
         }
       }
     }
-   }
+  }
   this->NumOfPrims = this->Prims.size();
   this->Trans = matr::Identity();
   return *this;
